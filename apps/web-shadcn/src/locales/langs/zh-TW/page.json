@@ -1,0 +1,170 @@
+{
+  "auth": {
+    "login": "登入",
+    "register": "註冊",
+    "codeLogin": "驗證碼登入",
+    "qrcodeLogin": "二維碼登入",
+    "forgetPassword": "忘記密碼",
+    "sendingCode": "正在傳送驗證碼",
+    "codeSentTo": "驗證碼已傳送至{0}",
+    "profile": "個人中心"
+  },
+  "dashboard": {
+    "title": "概覽",
+    "workspace": {
+      "title": "工作臺",
+      "welcome": "早上好，{name}，開始你的工作吧！",
+      "weather": "今日晴，20°C - 32°C！",
+      "navTitle": "快捷導航",
+      "todosTitle": "待辦事項",
+      "trendsTitle": "最新動態",
+      "projectTitle": "項目",
+      "taskTitle": "任務",
+      "taskDone": "已完成",
+      "dateJustNow": "剛剛",
+      "date1HourAgo": "1個小時前",
+      "date1DayAgo": "1天前",
+      "date2DaysAgo": "2天前",
+      "date3DaysAgo": "3天前",
+      "date1WeekAgo": "1周前",
+      "contentQuote1": "不要等待機會，而要創造機會。",
+      "contentQuote2": "現在的你決定將來的你。",
+      "contentQuote3": "沒有什麼才能比努力更重要。",
+      "contentQuote4": "熱情和欲望可以突破一切難關。",
+      "contentQuote5": "健康的身體是實現目標的基石。",
+      "contentQuote6": "路是走出來的，而不是空想出來的。",
+      "groupOpenSource": "開源組",
+      "groupAlgorithm": "算法組",
+      "groupPartTime": "上班摸魚",
+      "groupTech": "技術牛",
+      "groupArch": "架構組",
+      "navHome": "首頁",
+      "navDashboard": "儀表盤",
+      "navComponents": "組件",
+      "navSystem": "系統管理",
+      "navPermissions": "權限管理",
+      "navCharts": "圖表",
+      "taskReviewCode": "審查最近提交到Git儲存庫的前端代碼，確保代碼質量和規範。",
+      "taskReviewCodeTitle": "審查前端代碼提交",
+      "taskPerfOpt": "檢查並優化系統性能，降低CPU使用率。",
+      "taskPerfOptTitle": "系統性能優化",
+      "taskSecurity": "進行系統安全檢查，確保沒有安全漏洞或未授權的訪問。",
+      "taskSecurityTitle": "安全檢查",
+      "taskDeps": "更新項目中的所有npm依賴包，確保使用最新版本。",
+      "taskDepsTitle": "更新項目依賴",
+      "taskUI": "修復用戶報告的頁面UI顯示問題，確保在不同瀏覽器中顯示一致。",
+      "taskUITitle": "修復UI顯示問題",
+      "taskCreated": "在 <a>開源組</a> 創建了項目 <a>Vue</a>",
+      "taskFollowed": "關注了 <a>{name}</a>",
+      "taskPublished": "發布了 <a>個人動態</a>",
+      "taskArticle": "發表文章 <a>{title}</a>",
+      "taskReplied": "回复了 <a>{name}</a> 的問題 <a>{title}</a>",
+      "taskClosed": "關閉了問題 <a>{title}</a>",
+      "taskPushed": "推送了代碼到 <a>Github</a>",
+      "taskArticleVben": "發表文章 <a>如何編寫一個Vite插件</a>",
+      "commentExample": "這是一個示例數據，實際項目中需要根據實際情況進行調整",
+      "urlExample": "同樣，這裡的 url 也可以使用以 http 開头的外部鏈接",
+      "commentMethod": "這是一個示例方法，實際項目中需要根據實際情況進行調整",
+      "cardTitle": "項目",
+      "cardTrends": "最新動態",
+      "cardNav": "快捷導航",
+      "cardTodo": "待辦事項",
+      "cardVisitSource": "訪問來源"
+    },
+    "analytics": {
+      "title": "分析頁",
+      "index": {
+        "usersTitle": "用戶量",
+        "usersTotal": "總用戶量",
+        "visitsTitle": "訪問量",
+        "visitsTotal": "總訪問量",
+        "downloadsTitle": "下載量",
+        "downloadsTotal": "總下載量",
+        "usageTitle": "使用量",
+        "usageTotal": "總使用量",
+        "trafficLabel": "流量趨勢",
+        "monthlyVisitsLabel": "月訪問量"
+      },
+      "analyticsVisits": {
+        "visit": "訪問",
+        "trend": "趨勢",
+        "monthLabel": "{n}月"
+      },
+      "analyticsVisitsData": {
+        "web": "網頁",
+        "mobile": "移動端",
+        "client": "客戶端",
+        "thirdParty": "第三方",
+        "other": "其它",
+        "seriesVisit": "訪問",
+        "seriesTrend": "趨勢",
+        "ipad": "iPad"
+      },
+      "visitsSales": {
+        "outsourcing": "外包",
+        "custom": "定制",
+        "techSupport": "技術支持",
+        "remote": "遠程",
+        "commercialShare": "商業佔比"
+      },
+      "visitsSource": {
+        "searchEngine": "搜索引擎",
+        "direct": "直接訪問",
+        "email": "郵件營銷",
+        "alliance": "聯盟廣告",
+        "sourceTitle": "訪問來源"
+      }
+    }
+  },
+  "dataDisplay": {
+    "title": "數據展示",
+    "code": "工單編號",
+    "name": "產品名稱",
+    "category": "製造品類",
+    "line": "生產產線",
+    "planQuantity": "計劃產量",
+    "completedQuantity": "完成數量",
+    "status": "狀態",
+    "priority": "優先順序",
+    "operator": "負責人",
+    "createTime": "排產時間",
+    "remark": "備註說明",
+    "addNew": "新建工單",
+    "edit": "編輯工單",
+    "categoryOptions": {
+      "electronics": "電子製造",
+      "mechanics": "精密機械",
+      "optical": "光學光電",
+      "assembly": "整機總裝"
+    },
+    "statusOptions": {
+      "pending": "待排產",
+      "inProduction": "生產中",
+      "completed": "已完成",
+      "exception": "異常報損"
+    },
+    "priorityOptions": {
+      "low": "低",
+      "medium": "中",
+      "high": "緊急"
+    }
+  },
+  "print": {
+    "title": "列印",
+    "sn": {
+      "title": "列印序號",
+      "sn": "序號",
+      "snshow": "顯示序號",
+      "model": "型號",
+      "ean": "EAN",
+      "preview": "標籤預覽",
+      "selectHint": "點擊行可預覽標籤",
+      "print": "列印標籤",
+      "noSelection": "請先選擇要列印的行",
+      "labelType": "標籤類型",
+      "both": "兩者",
+      "qrCode": "二維碼",
+      "barcode": "條碼"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "title": "演示",
+  "access": {
+    "frontendPermissions": "前端許可權",
+    "backendPermissions": "後端許可權",
+    "pageAccess": "頁面訪問",
+    "buttonControl": "按鈕控制",
+    "menuVisible403": "選單可見(403)",
+    "superVisible": "Super 可見",
+    "adminVisible": "Admin 可見",
+    "userVisible": "User 可見"
+  },
+  "fallback": {
+    "title": "預設頁"
+  },
+  "features": {
+    "title": "功能",
+    "loginExpired": "登入過期",
+    "icons": "圖示",
+    "tabs": "標籤頁",
+    "tabDetail": "標籤詳情頁",
+    "fullScreen": "全屏",
+    "clipboard": "剪貼簿"
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "codeLogin": "验证码登录",
+    "qrcodeLogin": "二维码登录",
+    "forgetPassword": "忘记密码",
+    "sendingCode": "正在发送验证码",
+    "codeSentTo": "验证码已发送至{0}",
+    "profile": "个人中心"
+  },
+  "dashboard": {
+    "title": "概览",
+    "workspace": {
+      "title": "工作台",
+      "welcome": "早上好，{name}，开始你的工作吧！",
+      "weather": "今日晴，20℃ - 32℃！",
+      "navTitle": "快捷导航",
+      "todosTitle": "待办事项",
+      "trendsTitle": "最新动态",
+      "projectTitle": "项目",
+      "taskTitle": "任务",
+      "taskDone": "已完成",
+      "dateJustNow": "刚刚",
+      "date1HourAgo": "1个小时前",
+      "date1DayAgo": "1天前",
+      "date2DaysAgo": "2天前",
+      "date3DaysAgo": "3天前",
+      "date1WeekAgo": "1周前",
+      "contentQuote1": "不要等待机会，而要创造机会。",
+      "contentQuote2": "现在的你决定将来的你。",
+      "contentQuote3": "没有什么才能比努力更重要。",
+      "contentQuote4": "热情和欲望可以突破一切难关。",
+      "contentQuote5": "健康的身体是实现目标的基石。",
+      "contentQuote6": "路是走出来的，而不是空想出来的。",
+      "groupOpenSource": "开源组",
+      "groupAlgorithm": "算法组",
+      "groupPartTime": "上班摸鱼",
+      "groupTech": "技术牛",
+      "groupArch": "架构组",
+      "navHome": "首页",
+      "navDashboard": "仪表盘",
+      "navComponents": "组件",
+      "navSystem": "系统管理",
+      "navPermissions": "权限管理",
+      "navCharts": "图表",
+      "taskReviewCode": "审查最近提交到Git仓库的前端代码，确保代码质量和规范。",
+      "taskReviewCodeTitle": "审查前端代码提交",
+      "taskPerfOpt": "检查并优化系统性能，降低CPU使用率。",
+      "taskPerfOptTitle": "系统性能优化",
+      "taskSecurity": "进行系统安全检查，确保没有安全漏洞或未授权的访问。",
+      "taskSecurityTitle": "安全检查",
+      "taskDeps": "更新项目中的所有npm依赖包，确保使用最新版本。",
+      "taskDepsTitle": "更新项目依赖",
+      "taskUI": "修复用户报告的页面UI显示问题，确保在不同浏览器中显示一致。",
+      "taskUITitle": "修复UI显示问题",
+      "taskCreated": "在 <a>开源组</a> 创建了项目 <a>Vue</a>",
+      "taskFollowed": "关注了 <a>{name}</a>",
+      "taskPublished": "发布了 <a>个人动态</a>",
+      "taskArticle": "发表文章 <a>{title}</a>",
+      "taskReplied": "回复了 <a>{name}</a> 的问题 <a>{title}</a>",
+      "taskClosed": "关闭了问题 <a>{title}</a>",
+      "taskPushed": "推送了代码到 <a>Github</a>",
+      "taskArticleVben": "发表文章 <a>如何编写一个Vite插件</a>",
+      "commentExample": "这是一个示例数据，实际项目中需要根据实际情况进行调整",
+      "urlExample": "同样的，这里的 url 也可以使用以 http 开头的外部链接",
+      "commentMethod": "这是一个示例方法，实际项目中需要根据实际情况进行调整",
+      "cardTitle": "项目",
+      "cardTrends": "最新动态",
+      "cardNav": "快捷导航",
+      "cardTodo": "待办事项",
+      "cardVisitSource": "访问来源"
+    },
+    "analytics": {
+      "title": "分析页",
+      "index": {
+        "usersTitle": "用户量",
+        "usersTotal": "总用户量",
+        "visitsTitle": "访问量",
+        "visitsTotal": "总访问量",
+        "downloadsTitle": "下载量",
+        "downloadsTotal": "总下载量",
+        "usageTitle": "使用量",
+        "usageTotal": "总使用量",
+        "trafficLabel": "流量趋势",
+        "monthlyVisitsLabel": "月访问量"
+      },
+      "analyticsVisits": {
+        "visit": "访问",
+        "trend": "趋势",
+        "monthLabel": "{n}月"
+      },
+      "analyticsVisitsData": {
+        "web": "网页",
+        "mobile": "移动端",
+        "client": "客户端",
+        "thirdParty": "第三方",
+        "other": "其它",
+        "seriesVisit": "访问",
+        "seriesTrend": "趋势",
+        "ipad": "iPad"
+      },
+      "visitsSales": {
+        "outsourcing": "外包",
+        "custom": "定制",
+        "techSupport": "技术支持",
+        "remote": "远程",
+        "commercialShare": "商业占比"
+      },
+      "visitsSource": {
+        "searchEngine": "搜索引擎",
+        "direct": "直接访问",
+        "email": "邮件营销",
+        "alliance": "联盟广告",
+        "sourceTitle": "访问来源"
+      }
+    }
+  },
+  "dataDisplay": {
+    "title": "数据展示",
+    "code": "工单编号",
+    "name": "产品名称",
+    "category": "制造品类",
+    "line": "生产产线",
+    "planQuantity": "计划产量",
+    "completedQuantity": "完成数量",
+    "status": "状态",
+    "priority": "优先级",
+    "operator": "负责人",
+    "createTime": "排产时间",
+    "remark": "备注说明",
+    "addNew": "新建工单",
+    "edit": "编辑工单",
+    "categoryOptions": {
+      "electronics": "电子制造",
+      "mechanics": "精密机械",
+      "optical": "光学光电",
+      "assembly": "整机总装"
+    },
+    "statusOptions": {
+      "pending": "待排产",
+      "inProduction": "生产中",
+      "completed": "已完成",
+      "exception": "异常报损"
+    },
+    "priorityOptions": {
+      "low": "低",
+      "medium": "中",
+      "high": "紧急"
+    }
+  },
+  "print": {
+    "title": "打印",
+    "sn": {
+      "title": "打印序列号",
+      "sn": "序列号",
+      "snshow": "显示序列号",
+      "model": "型号",
+      "ean": "EAN",
+      "preview": "标签预览",
+      "selectHint": "点击行可预览标签",
+      "print": "打印标签",
+      "noSelection": "请先选择要打印的行",
+      "labelType": "标签类型",
+      "both": "两者",
+      "qrCode": "二维码",
+      "barcode": "条形码"
+    }
+  }
+}

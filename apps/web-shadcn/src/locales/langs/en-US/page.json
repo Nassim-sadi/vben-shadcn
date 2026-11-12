@@ -1,0 +1,170 @@
+{
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "codeLogin": "Code Login",
+    "qrcodeLogin": "Qr Code Login",
+    "forgetPassword": "Forget Password",
+    "sendingCode": "SMS Code is sending...",
+    "codeSentTo": "Code has been sent to {0}",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "workspace": {
+      "title": "Workspace",
+      "welcome": "Good morning, {name}, start your day!",
+      "weather": "Today sunny, 20°C - 32°C!",
+      "navTitle": "Quick Navigation",
+      "todosTitle": "To-do List",
+      "trendsTitle": "Visit Source",
+      "projectTitle": "Project",
+      "taskTitle": "Task",
+      "taskDone": "Done",
+      "dateJustNow": "Just now",
+      "date1HourAgo": "1 hour ago",
+      "date1DayAgo": "1 day ago",
+      "date2DaysAgo": "2 days ago",
+      "date3DaysAgo": "3 days ago",
+      "date1WeekAgo": "1 week ago",
+      "contentQuote1": "Don't wait for opportunity, create it.",
+      "contentQuote2": "Your present decides your future.",
+      "contentQuote3": "Nothing is more important than hard work.",
+      "contentQuote4": "Passion and desire can overcome any difficulty.",
+      "contentQuote5": "A healthy body is the foundation of achieving goals.",
+      "contentQuote6": "The road is walked, not imagined.",
+      "groupOpenSource": "Open Source Group",
+      "groupAlgorithm": "Algorithm Group",
+      "groupPartTime": "Part-time Group",
+      "groupTech": "Tech Group",
+      "groupArch": "Arch Group",
+      "navHome": "Home",
+      "navDashboard": "Dashboard",
+      "navComponents": "Components",
+      "navSystem": "System Management",
+      "navPermissions": "Permission Management",
+      "navCharts": "Charts",
+      "taskReviewCode": "Review frontend code commits recently submitted to the Git repository, ensure code quality and standards.",
+      "taskReviewCodeTitle": "Review frontend code commits",
+      "taskPerfOpt": "Check and optimize system performance, reduce CPU usage.",
+      "taskPerfOptTitle": "System performance optimization",
+      "taskSecurity": "Perform system security check, ensure no security vulnerabilities or unauthorized access.",
+      "taskSecurityTitle": "Security check",
+      "taskDeps": "Update all npm dependencies in the project, ensure using latest versions.",
+      "taskDepsTitle": "Update project dependencies",
+      "taskUI": "Fix user-reported page UI display issues, ensure consistent display across different browsers.",
+      "taskUITitle": "Fix UI display issues",
+      "taskCreated": "Created project <a>Vue</a> in group <a>Open Source Group</a>",
+      "taskFollowed": "Followed <a>{name}</a>",
+      "taskPublished": "Published <a>Personal Dynamics</a>",
+      "taskArticle": "Published article <a>{title}</a>",
+      "taskReplied": "Replied to <a>{name}</a>'s question <a>{title}</a>",
+      "taskClosed": "Closed issue <a>{title}</a>",
+      "taskPushed": "Pushed code to <a>Github</a>",
+      "taskArticleVben": "Published article <a>How to write a Vite plugin</a>",
+      "commentExample": "This is example data, adjust according to actual situation in real projects.",
+      "urlExample": "URL can also be an external link starting with http",
+      "commentMethod": "This is an example method, adjust according to actual situation in real projects.",
+      "cardTitle": "Project",
+      "cardTrends": "Latest Dynamics",
+      "cardNav": "Quick Navigation",
+      "cardTodo": "To-do List",
+      "cardVisitSource": "Visit Source"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "index": {
+        "usersTitle": "User Count",
+        "usersTotal": "Total Users",
+        "visitsTitle": "Visit Count",
+        "visitsTotal": "Total Visits",
+        "downloadsTitle": "Download Count",
+        "downloadsTotal": "Total Downloads",
+        "usageTitle": "Usage Count",
+        "usageTotal": "Total Usage",
+        "trafficLabel": "Traffic Trend",
+        "monthlyVisitsLabel": "Monthly Visits"
+      },
+      "analyticsVisits": {
+        "visit": "Visit",
+        "trend": "Trend",
+        "monthLabel": "Month {n}"
+      },
+      "analyticsVisitsData": {
+        "web": "Web",
+        "mobile": "Mobile",
+        "client": "Client",
+        "thirdParty": "Third-party",
+        "other": "Other",
+        "seriesVisit": "Visit",
+        "seriesTrend": "Trend",
+        "ipad": "iPad"
+      },
+      "visitsSales": {
+        "outsourcing": "Outsourcing",
+        "custom": "Custom",
+        "techSupport": "Tech Support",
+        "remote": "Remote",
+        "commercialShare": "Commercial Share"
+      },
+      "visitsSource": {
+        "searchEngine": "Search Engine",
+        "direct": "Direct",
+        "email": "Email Marketing",
+        "alliance": "Alliance Ads",
+        "sourceTitle": "Visit Source"
+      }
+    }
+  },
+  "dataDisplay": {
+    "title": "Data Display",
+    "code": "Order Code",
+    "name": "Product Name",
+    "category": "Category",
+    "line": "Production Line",
+    "planQuantity": "Plan Qty",
+    "completedQuantity": "Completed Qty",
+    "status": "Status",
+    "priority": "Priority",
+    "operator": "Operator",
+    "createTime": "Scheduled Time",
+    "remark": "Remark",
+    "addNew": "New Order",
+    "edit": "Edit Order",
+    "categoryOptions": {
+      "electronics": "Electronics",
+      "mechanics": "Mechanics",
+      "optical": "Optics",
+      "assembly": "Assembly"
+    },
+    "statusOptions": {
+      "pending": "Pending",
+      "inProduction": "In Production",
+      "completed": "Completed",
+      "exception": "Exception"
+    },
+    "priorityOptions": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
+  "print": {
+    "title": "Print",
+    "sn": {
+      "title": "Print SN",
+      "sn": "SN",
+      "snshow": "SN Show",
+      "model": "Model",
+      "ean": "EAN",
+      "preview": "Label Preview",
+      "selectHint": "Click a row to preview its label",
+      "print": "Print Label",
+      "noSelection": "Please select a row to print",
+      "labelType": "Label Type",
+      "both": "Both",
+      "qrCode": "QR Code",
+      "barcode": "Barcode"
+    }
+  }
+}

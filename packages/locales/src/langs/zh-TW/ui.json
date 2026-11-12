@@ -1,0 +1,329 @@
+{
+  "formRules": {
+    "required": "請輸入{0}",
+    "selectRequired": "請選擇{0}",
+    "minLength": "{0}至少{1}個字元",
+    "maxLength": "{0}最多{1}個字元",
+    "length": "{0}長度必須為{1}個字元",
+    "alreadyExists": "{0} `{1}` 已存在",
+    "startWith": "{0}必須以 {1} 開頭",
+    "invalidURL": "請輸入有效的連結",
+    "sizeLimit": "檔案大小不能超過 {0}MB",
+    "previewWarning": "無法開啟檔案，沒有可用的URL或預覽地址"
+  },
+  "actionTitle": {
+    "edit": "修改{0}",
+    "create": "新增{0}",
+    "delete": "刪除{0}",
+    "view": "檢視{0}"
+  },
+  "actionMessage": {
+    "deleteConfirm": "確定刪除 {0} 嗎？",
+    "deleting": "正在刪除 {0} ...",
+    "deleteSuccess": "{0} 刪除成功",
+    "operationSuccess": "操作成功",
+    "operationFailed": "操作失敗"
+  },
+  "placeholder": {
+    "input": "請輸入",
+    "select": "請選擇",
+    "upload": "點選上傳"
+  },
+  "captcha": {
+    "title": "請完成安全驗證",
+    "sliderSuccessText": "驗證通過",
+    "sliderDefaultText": "請按住滑塊拖動",
+    "sliderRotateDefaultTip": "點選圖片可重新整理",
+    "sliderTranslateDefaultTip": "點選圖片可重新整理",
+    "sliderRotateFailTip": "驗證失敗",
+    "sliderRotateSuccessTip": "驗證成功，耗時{0}秒",
+    "sliderTranslateFailTip": "驗證失敗",
+    "sliderTranslateSuccessTip": "驗證成功，耗時{0}秒",
+    "alt": "支援img標籤src屬性值",
+    "refreshAriaLabel": "重新整理驗證碼",
+    "confirmAriaLabel": "確認選擇",
+    "confirm": "確認",
+    "pointAriaLabel": "點選點",
+    "clickInOrder": "請依次點選"
+  },
+  "iconPicker": {
+    "placeholder": "選擇一個圖示",
+    "search": "搜尋圖示..."
+  },
+  "jsonViewer": {
+    "copy": "複製",
+    "copied": "已複製"
+  },
+  "crop": {
+    "title": "圖片裁剪",
+    "titleTip": "裁剪比例 {0}",
+    "confirm": "裁剪",
+    "cancel": "取消裁剪",
+    "errorTip": "裁剪錯誤"
+  },
+  "tiptap": {
+    "placeholder": "請輸入內容...",
+    "prompts": {
+      "image": "請輸入圖片地址",
+      "link": "請輸入連結地址"
+    },
+    "toolbar": {
+      "bold": "加粗",
+      "italic": "斜體",
+      "underline": "下劃線",
+      "strike": "刪除線",
+      "code": "行內程式碼",
+      "codeBlock": "程式碼塊",
+      "heading": "標題",
+      "paragraph": "正文",
+      "heading1": "標題1",
+      "heading2": "標題2",
+      "heading3": "標題3",
+      "heading4": "標題4",
+      "bulletList": "無序列表",
+      "orderedList": "有序列表",
+      "blockquote": "引用",
+      "link": "連結",
+      "unlink": "移除連結",
+      "image": "圖片",
+      "imageUrl": "圖片URL",
+      "imageUpload": "從本地上傳",
+      "textColor": "文字顏色",
+      "highlightColor": "高亮顏色",
+      "alignLeft": "左對齊",
+      "alignCenter": "居中",
+      "alignRight": "右對齊",
+      "preview": "預覽",
+      "undo": "撤銷",
+      "redo": "重做",
+      "clear": "清除"
+    },
+    "upload": {
+      "fileTooLarge": "檔案大小超出限制",
+      "fileTypeNotAllowed": "不支援的檔案型別",
+      "onlySingleImage": "僅支援單張圖片上傳，已選取第一張",
+      "uploadFailed": "上傳失敗"
+    }
+  },
+  "fallback": {
+    "pageNotFound": "哎呀！未找到頁面",
+    "pageNotFoundDesc": "抱歉，我們無法找到您要找的頁面。",
+    "forbidden": "哎呀！訪問被拒絕",
+    "forbiddenDesc": "抱歉，您沒有許可權訪問此頁面。",
+    "internalError": "哎呀！出錯了",
+    "internalErrorDesc": "抱歉，伺服器遇到錯誤。",
+    "offline": "離線頁面",
+    "offlineError": "哎呀！網路錯誤",
+    "offlineErrorDesc": "抱歉，無法連線到網際網路，請檢查您的網路連線並重試。",
+    "comingSoon": "即將推出",
+    "http": {
+      "requestTimeout": "請求超時，請稍後再試。",
+      "networkError": "網路異常，請檢查您的網路連線後重試。",
+      "badRequest": "請求錯誤。請檢查您的輸入並重試。",
+      "unauthorized": "登入認證過期，請重新登入後繼續。",
+      "forbidden": "禁止訪問, 您沒有許可權訪問此資源。",
+      "notFound": "未找到, 請求的資源不存在。",
+      "internalServerError": "內部伺服器錯誤，請稍後再試。"
+    }
+  },
+  "widgets": {
+    "document": "文件",
+    "qa": "問題 & 幫助",
+    "setting": "設定",
+    "logoutTip": "是否退出登入？",
+    "viewAll": "檢視所有訊息",
+    "notifications": "通知",
+    "markAllAsRead": "全部標記為已讀",
+    "clearNotifications": "清空",
+    "checkUpdatesTitle": "新版本可用",
+    "checkUpdatesDescription": "點選重新整理以獲取最新版本",
+    "search": {
+      "title": "搜尋",
+      "searchNavigate": "搜尋導航選單",
+      "select": "選擇",
+      "navigate": "導航",
+      "close": "關閉",
+      "noResults": "未找到搜尋結果",
+      "noRecent": "沒有搜尋歷史",
+      "recent": "搜尋歷史"
+    },
+    "lockScreen": {
+      "title": "鎖定螢幕",
+      "screenButton": "鎖定",
+      "password": "密碼",
+      "placeholder": "請輸入鎖屏密碼",
+      "unlock": "點選解鎖",
+      "errorPasswordTip": "密碼錯誤，請重新輸入",
+      "backToLogin": "返回登入",
+      "entry": "進入系統"
+    },
+    "timezone": {
+      "setTimezone": "設定時區",
+      "setSuccess": "時區設定成功"
+    }
+  },
+  "page": {
+    "dashboard": {
+      "workspace": {
+        "welcome": "早上好，{name}，開始你的工作吧！",
+        "weather": "今日晴，20℃ - 32℃！",
+        "navTitle": "快捷導航",
+        "todosTitle": "待辦事項",
+        "trendsTitle": "最新動態",
+        "projectTitle": "項目",
+        "taskTitle": "任務",
+        "taskDone": "已完成",
+        "dateJustNow": "剛剛",
+        "date1HourAgo": "1個小時前",
+        "date1DayAgo": "1天前",
+        "date2DaysAgo": "2天前",
+        "date3DaysAgo": "3天前",
+        "date1WeekAgo": "1周前",
+        "contentQuote1": "不要等待機會，而要創造機會。",
+        "contentQuote2": "現在的你決定將來的你。",
+        "contentQuote3": "沒有什麼才能比努力更重要。",
+        "contentQuote4": "熱情和欲望可以突破一切難關。",
+        "contentQuote5": "健康的身體是實現目標的基石。",
+        "contentQuote6": "路是走出來的，而不是空想出來的。",
+        "groupOpenSource": "開源組",
+        "groupAlgorithm": "算法組",
+        "groupPartTime": "上班摸魚",
+        "groupTech": "技術牛",
+        "groupArch": "架構組",
+        "navHome": "首頁",
+        "navDashboard": "儀表板",
+        "navComponents": "組件",
+        "navSystem": "系統管理",
+        "navPermissions": "權限管理",
+        "navCharts": "圖表",
+        "taskReviewCode": "審查最近提交到Git倉庫的前端代碼，確保代碼質量和規範。",
+        "taskReviewCodeTitle": "審查前端代碼提交",
+        "taskPerfOpt": "檢查並優化系統性能，降低CPU使用率。",
+        "taskPerfOptTitle": "系統性能優化",
+        "taskSecurity": "進行系統安全檢查，確保沒有安全漏洞或未授權的訪問。",
+        "taskSecurityTitle": "安全檢查",
+        "taskDeps": "更新項目中的所有npm依賴包，確保使用最新版本。",
+        "taskDepsTitle": "更新項目依賴",
+        "taskUI": "修復用戶報告的頁面UI顯示問題，確保在不同瀏覽器中顯示一致。",
+        "taskUITitle": "修復UI顯示問題",
+        "taskCreated": "在 <a>開源組</a> 創建了項目 <a>Vue</a>",
+        "taskFollowed": "關注了 <a>{name}</a>",
+        "taskPublished": "發布了 <a>個人動態</a>",
+        "taskArticle": "發表文章 <a>{title}</a>",
+        "taskReplied": "回复了 <a>{name}</a> 的問題 <a>{title}</a>",
+        "taskClosed": "關閉了問題 <a>{title}</a>",
+        "taskPushed": "推送了代碼到 <a>Github</a>",
+        "taskArticleVben": "發表文章 <a>如何編寫一個Vite插件</a>",
+        "commentExample": "這是一個示例數據，实际項目中需要根據实际情況進行調整",
+        "urlExample": "同樣，這裡的 url 也可以使用以 http 開头的外部鏈接",
+        "commentMethod": "這是一個示例方法，实际項目中需要根據实际情況進行調整",
+        "cardTitle": "項目",
+        "cardTrends": "最新動態",
+        "cardNav": "快捷導航",
+        "cardTodo": "待辦事項",
+        "cardVisitSource": "訪問來源"
+      }
+    },
+    "analytics": {
+      "index": {
+        "usersTitle": "用戶量",
+        "usersTotal": "總用戶量",
+        "visitsTitle": "訪問量",
+        "visitsTotal": "總訪問量",
+        "downloadsTitle": "下載量",
+        "downloadsTotal": "總下載量",
+        "usageTitle": "使用量",
+        "usageTotal": "總使用量",
+        "trafficLabel": "流量趨勢",
+        "monthlyVisitsLabel": "月訪問量"
+      },
+      "analyticsVisits": {
+        "visit": "訪問",
+        "trend": "趨勢",
+        "monthLabel": "{n}月"
+      },
+      "analyticsVisitsData": {
+        "web": "網頁",
+        "mobile": "移動端",
+        "client": "客戶端",
+        "thirdParty": "第三方",
+        "other": "其它",
+        "seriesVisit": "訪問",
+        "seriesTrend": "趨勢",
+        "ipad": "iPad"
+      },
+      "analyticsVisitsSales": {
+        "outsourcing": "外包",
+        "custom": "定制",
+        "techSupport": "技術支持",
+        "remote": "遠程",
+        "commercialShare": "商業佔比"
+      },
+      "analyticsVisitsSource": {
+        "searchEngine": "搜索引擎",
+        "direct": "直接訪問",
+        "email": "郵件營銷",
+        "alliance": "聯盟廣告",
+        "sourceTitle": "訪問來源"
+      }
+    },
+    "system": {
+      "menu": {
+        "operationAppend": "新增下級"
+      },
+      "role": {
+        "confirmStatus": "你要將{name}的狀態切換為【{status}】嗎？",
+        "switchStatus": "切換狀態"
+      },
+      "user": {
+        "confirmStatus": "你要將{name}的狀態切換為【{status}】嗎？",
+        "switchStatus": "切換狀態"
+      }
+    },
+    "dataDisplay": {
+      "addNew": "新增",
+      "edit": "編輯",
+      "code": "編碼",
+      "name": "名稱",
+      "category": "類別",
+      "categoryOptions": {
+        "electronics": "電子",
+        "mechanics": "機械",
+        "optical": "光學",
+        "assembly": "裝配"
+      },
+      "line": "產線",
+      "planQuantity": "計劃數量",
+      "completedQuantity": "完成數量",
+      "priority": "優先級",
+      "priorityOptions": {
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "status": "狀態",
+      "statusOptions": {
+        "pending": "待處理",
+        "inProduction": "生產中",
+        "completed": "已完成",
+        "exception": "異常"
+      },
+      "operator": "操作人",
+      "remark": "備註",
+      "createTime": "創建時間",
+      "title": "標題"
+    },
+    "demos": {
+      "features": {
+        "snPrint": {
+          "title": "列印 SN",
+          "enterSn": "請輸入序列號",
+          "generate": "產生",
+          "print": "列印標籤",
+          "qrCode": "QR 碼",
+          "barcode": "條碼"
+        }
+      }
+    }
+  }
+}

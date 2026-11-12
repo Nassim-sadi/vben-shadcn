@@ -1,0 +1,25 @@
+{
+  "title": "演示",
+  "access": {
+    "frontendPermissions": "前端权限",
+    "backendPermissions": "后端权限",
+    "pageAccess": "页面访问",
+    "buttonControl": "按钮控制",
+    "menuVisible403": "菜单可见(403)",
+    "superVisible": "Super 可见",
+    "adminVisible": "Admin 可见",
+    "userVisible": "User 可见"
+  },
+  "fallback": {
+    "title": "缺省页"
+  },
+  "features": {
+    "title": "功能",
+    "loginExpired": "登录过期",
+    "icons": "图标",
+    "tabs": "标签页",
+    "tabDetail": "标签详情页",
+    "fullScreen": "全屏",
+    "clipboard": "剪贴板"
+  }
+}

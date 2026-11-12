@@ -1,0 +1,25 @@
+{
+  "title": "Demos",
+  "access": {
+    "frontendPermissions": "Frontend Permissions",
+    "backendPermissions": "Backend Permissions",
+    "pageAccess": "Page Access",
+    "buttonControl": "Button Control",
+    "menuVisible403": "Menu Visible(403)",
+    "superVisible": "Visible to Super",
+    "adminVisible": "Visible to Admin",
+    "userVisible": "Visible to User"
+  },
+  "fallback": {
+    "title": "Fallback Page"
+  },
+  "features": {
+    "title": "Features",
+    "loginExpired": "Login Expired",
+    "icons": "Icons",
+    "tabs": "Tabs",
+    "tabDetail": "Tab Detail Page",
+    "fullScreen": "FullScreen",
+    "clipboard": "Clipboard"
+  }
+}

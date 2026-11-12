@@ -1,0 +1,329 @@
+{
+  "formRules": {
+    "required": "请输入{0}",
+    "selectRequired": "请选择{0}",
+    "minLength": "{0}至少{1}个字符",
+    "maxLength": "{0}最多{1}个字符",
+    "length": "{0}长度必须为{1}个字符",
+    "alreadyExists": "{0} `{1}` 已存在",
+    "startWith": "{0}必须以 {1} 开头",
+    "invalidURL": "请输入有效的链接",
+    "sizeLimit": "文件大小不能超过 {0}MB",
+    "previewWarning": "无法打开文件，没有可用的URL或预览地址"
+  },
+  "actionTitle": {
+    "edit": "修改{0}",
+    "create": "新增{0}",
+    "delete": "删除{0}",
+    "view": "查看{0}"
+  },
+  "actionMessage": {
+    "deleteConfirm": "确定删除 {0} 吗？",
+    "deleting": "正在删除 {0} ...",
+    "deleteSuccess": "{0} 删除成功",
+    "operationSuccess": "操作成功",
+    "operationFailed": "操作失败"
+  },
+  "placeholder": {
+    "input": "请输入",
+    "select": "请选择",
+    "upload": "点击上传"
+  },
+  "captcha": {
+    "title": "请完成安全验证",
+    "sliderSuccessText": "验证通过",
+    "sliderDefaultText": "请按住滑块拖动",
+    "sliderRotateDefaultTip": "点击图片可刷新",
+    "sliderTranslateDefaultTip": "点击图片可刷新",
+    "sliderRotateFailTip": "验证失败",
+    "sliderRotateSuccessTip": "验证成功，耗时{0}秒",
+    "sliderTranslateFailTip": "验证失败",
+    "sliderTranslateSuccessTip": "验证成功，耗时{0}秒",
+    "alt": "支持img标签src属性值",
+    "refreshAriaLabel": "刷新验证码",
+    "confirmAriaLabel": "确认选择",
+    "confirm": "确认",
+    "pointAriaLabel": "点击点",
+    "clickInOrder": "请依次点击"
+  },
+  "iconPicker": {
+    "placeholder": "选择一个图标",
+    "search": "搜索图标..."
+  },
+  "jsonViewer": {
+    "copy": "复制",
+    "copied": "已复制"
+  },
+  "crop": {
+    "title": "图片裁剪",
+    "titleTip": "裁剪比例 {0}",
+    "confirm": "裁剪",
+    "cancel": "取消裁剪",
+    "errorTip": "裁剪错误"
+  },
+  "tiptap": {
+    "placeholder": "请输入内容...",
+    "prompts": {
+      "image": "请输入图片地址",
+      "link": "请输入链接地址"
+    },
+    "toolbar": {
+      "bold": "加粗",
+      "italic": "斜体",
+      "underline": "下划线",
+      "strike": "删除线",
+      "code": "行内代码",
+      "codeBlock": "代码块",
+      "heading": "标题",
+      "paragraph": "正文",
+      "heading1": "标题1",
+      "heading2": "标题2",
+      "heading3": "标题3",
+      "heading4": "标题4",
+      "bulletList": "无序列表",
+      "orderedList": "有序列表",
+      "blockquote": "引用",
+      "link": "链接",
+      "unlink": "移除链接",
+      "image": "图片",
+      "imageUrl": "图片URL",
+      "imageUpload": "从本地上传",
+      "textColor": "文字颜色",
+      "highlightColor": "高亮颜色",
+      "alignLeft": "左对齐",
+      "alignCenter": "居中",
+      "alignRight": "右对齐",
+      "preview": "预览",
+      "undo": "撤销",
+      "redo": "重做",
+      "clear": "清除"
+    },
+    "upload": {
+      "fileTooLarge": "文件大小超出限制",
+      "fileTypeNotAllowed": "不支持的文件类型",
+      "onlySingleImage": "仅支持单张图片上传，已选取第一张",
+      "uploadFailed": "上传失败"
+    }
+  },
+  "fallback": {
+    "pageNotFound": "哎呀！未找到页面",
+    "pageNotFoundDesc": "抱歉，我们无法找到您要找的页面。",
+    "forbidden": "哎呀！访问被拒绝",
+    "forbiddenDesc": "抱歉，您没有权限访问此页面。",
+    "internalError": "哎呀！出错了",
+    "internalErrorDesc": "抱歉，服务器遇到错误。",
+    "offline": "离线页面",
+    "offlineError": "哎呀！网络错误",
+    "offlineErrorDesc": "抱歉，无法连接到互联网，请检查您的网络连接并重试。",
+    "comingSoon": "即将推出",
+    "http": {
+      "requestTimeout": "请求超时，请稍后再试。",
+      "networkError": "网络异常，请检查您的网络连接后重试。",
+      "badRequest": "请求错误。请检查您的输入并重试。",
+      "unauthorized": "登录认证过期，请重新登录后继续。",
+      "forbidden": "禁止访问, 您没有权限访问此资源。",
+      "notFound": "未找到, 请求的资源不存在。",
+      "internalServerError": "内部服务器错误，请稍后再试。"
+    }
+  },
+  "widgets": {
+    "document": "文档",
+    "qa": "问题 & 帮助",
+    "setting": "设置",
+    "logoutTip": "是否退出登录？",
+    "viewAll": "查看所有消息",
+    "notifications": "通知",
+    "markAllAsRead": "全部标记为已读",
+    "clearNotifications": "清空",
+    "checkUpdatesTitle": "新版本可用",
+    "checkUpdatesDescription": "点击刷新以获取最新版本",
+    "search": {
+      "title": "搜索",
+      "searchNavigate": "搜索导航菜单",
+      "select": "选择",
+      "navigate": "导航",
+      "close": "关闭",
+      "noResults": "未找到搜索结果",
+      "noRecent": "没有搜索历史",
+      "recent": "搜索历史"
+    },
+    "lockScreen": {
+      "title": "锁定屏幕",
+      "screenButton": "锁定",
+      "password": "密码",
+      "placeholder": "请输入锁屏密码",
+      "unlock": "点击解锁",
+      "errorPasswordTip": "密码错误，请重新输入",
+      "backToLogin": "返回登录",
+      "entry": "进入系统"
+    },
+    "timezone": {
+      "setTimezone": "设置时区",
+      "setSuccess": "时区设置成功"
+    }
+  },
+  "page": {
+    "dashboard": {
+      "workspace": {
+        "welcome": "早上好，{name}，开始你的工作吧！",
+        "weather": "今日晴，20℃ - 32℃！",
+        "navTitle": "快捷导航",
+        "todosTitle": "待办事项",
+        "trendsTitle": "最新动态",
+        "projectTitle": "项目",
+        "taskTitle": "任务",
+        "taskDone": "已完成",
+        "dateJustNow": "刚刚",
+        "date1HourAgo": "1个小时前",
+        "date1DayAgo": "1天前",
+        "date2DaysAgo": "2天前",
+        "date3DaysAgo": "3天前",
+        "date1WeekAgo": "1周前",
+        "contentQuote1": "不要等待机会，而要创造机会。",
+        "contentQuote2": "现在的你决定将来的你。",
+        "contentQuote3": "没有什么才能比努力更重要。",
+        "contentQuote4": "热情和欲望可以突破一切难关。",
+        "contentQuote5": "健康的身体是实现目标的基石。",
+        "contentQuote6": "路是走出来的，而不是空想出来的。",
+        "groupOpenSource": "开源组",
+        "groupAlgorithm": "算法组",
+        "groupPartTime": "上班摸鱼",
+        "groupTech": "技术牛",
+        "groupArch": "架构组",
+        "navHome": "首页",
+        "navDashboard": "仪表盘",
+        "navComponents": "组件",
+        "navSystem": "系统管理",
+        "navPermissions": "权限管理",
+        "navCharts": "图表",
+        "taskReviewCode": "审查最近提交到Git仓库的前端代码，确保代码质量和规范。",
+        "taskReviewCodeTitle": "审查前端代码提交",
+        "taskPerfOpt": "检查并优化系统性能，降低CPU使用率。",
+        "taskPerfOptTitle": "系统性能优化",
+        "taskSecurity": "进行系统安全检查，确保没有安全漏洞或未授权的访问。",
+        "taskSecurityTitle": "安全检查",
+        "taskDeps": "更新项目中的所有npm依赖包，确保使用最新版本。",
+        "taskDepsTitle": "更新项目依赖",
+        "taskUI": "修复用户报告的页面UI显示问题，确保在不同浏览器中显示一致。",
+        "taskUITitle": "修复UI显示问题",
+        "taskCreated": "在 <a>开源组</a> 创建了项目 <a>Vue</a>",
+        "taskFollowed": "关注了 <a>{name}</a>",
+        "taskPublished": "发布了 <a>个人动态</a>",
+        "taskArticle": "发表文章 <a>{title}</a>",
+        "taskReplied": "回复了 <a>{name}</a> 的问题 <a>{title}</a>",
+        "taskClosed": "关闭了问题 <a>{title}</a>",
+        "taskPushed": "推送了代码到 <a>Github</a>",
+        "taskArticleVben": "发表文章 <a>如何编写一个Vite插件</a>",
+        "commentExample": "这是一个示例数据，实际项目中需要根据实际情况进行调整",
+        "urlExample": "同样的，这里的 url 也可以使用以 http 开头的外部链接",
+        "commentMethod": "这是一个示例方法，实际项目中需要根据实际情况进行调整",
+        "cardTitle": "项目",
+        "cardTrends": "最新动态",
+        "cardNav": "快捷导航",
+        "cardTodo": "待办事项",
+        "cardVisitSource": "访问来源"
+      }
+    },
+    "analytics": {
+      "index": {
+        "usersTitle": "用户量",
+        "usersTotal": "总用户量",
+        "visitsTitle": "访问量",
+        "visitsTotal": "总访问量",
+        "downloadsTitle": "下载量",
+        "downloadsTotal": "总下载量",
+        "usageTitle": "使用量",
+        "usageTotal": "总使用量",
+        "trafficLabel": "流量趋势",
+        "monthlyVisitsLabel": "月访问量"
+      },
+      "analyticsVisits": {
+        "visit": "访问",
+        "trend": "趋势",
+        "monthLabel": "{n}月"
+      },
+      "analyticsVisitsData": {
+        "web": "网页",
+        "mobile": "移动端",
+        "client": "客户端",
+        "thirdParty": "第三方",
+        "other": "其它",
+        "seriesVisit": "访问",
+        "seriesTrend": "趋势",
+        "ipad": "iPad"
+      },
+      "analyticsVisitsSales": {
+        "outsourcing": "外包",
+        "custom": "定制",
+        "techSupport": "技术支持",
+        "remote": "远程",
+        "commercialShare": "商业占比"
+      },
+      "analyticsVisitsSource": {
+        "searchEngine": "搜索引擎",
+        "direct": "直接访问",
+        "email": "邮件营销",
+        "alliance": "联盟广告",
+        "sourceTitle": "访问来源"
+      }
+    },
+    "system": {
+      "menu": {
+        "operationAppend": "新增下级"
+      },
+      "role": {
+        "confirmStatus": "你要将{name}的状态切换为【{status}】吗？",
+        "switchStatus": "切换状态"
+      },
+      "user": {
+        "confirmStatus": "你要将{name}的状态切换为【{status}】吗？",
+        "switchStatus": "切换状态"
+      }
+    },
+    "dataDisplay": {
+      "addNew": "新增",
+      "edit": "编辑",
+      "code": "编码",
+      "name": "名称",
+      "category": "类别",
+      "categoryOptions": {
+        "electronics": "电子",
+        "mechanics": "机械",
+        "optical": "光学",
+        "assembly": "装配"
+      },
+      "line": "产线",
+      "planQuantity": "计划数量",
+      "completedQuantity": "完成数量",
+      "priority": "优先级",
+      "priorityOptions": {
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "status": "状态",
+      "statusOptions": {
+        "pending": "待处理",
+        "inProduction": "生产中",
+        "completed": "已完成",
+        "exception": "异常"
+      },
+      "operator": "操作人",
+      "remark": "备注",
+      "createTime": "创建时间",
+      "title": "标题"
+    },
+    "demos": {
+      "features": {
+        "snPrint": {
+          "title": "打印 SN",
+          "enterSn": "请输入序列号",
+          "generate": "生成",
+          "print": "打印标签",
+          "qrCode": "二维码",
+          "barcode": "条码"
+        }
+      }
+    }
+  }
+}
