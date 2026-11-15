@@ -169,6 +169,7 @@ function onCreate() {
 async function loadDeptList() {
   try {
     const res = await getDeptList();
+    console.log('Department list loaded:', res);
     deptList.value = res;
   } catch (error) {
     console.error('Failed to load department list:', error);
@@ -258,77 +259,7 @@ async function handleExport() {
   }
 }
 
-function handleImportFileChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
 
-  (async () => {
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(arrayBuffer);
-      const worksheet = workbook.getWorksheet(1);
-      if (!worksheet) {
-        toast.error('No worksheet found in file');
-        return;
-      }
-
-      const rows: SystemUserApi.SystemUser[] = [];
-      worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return; // skip header
-        const id = row.getCell(1).value as string;
-        const name = row.getCell(2).value as string;
-        const gender = row.getCell(3).value as number;
-        const statusRaw = row.getCell(4).value as string;
-        const deptId = row.getCell(5).value as string;
-        const remark = row.getCell(6).value as string;
-        const createTime = row.getCell(7).value as string;
-
-        if (!id || !name) return;
-
-        rows.push({
-          id,
-          name,
-          gender: (gender as 0 | 1 | 2) ?? 0,
-          status: statusRaw === $t('common.enabled') ? 1 : 0,
-          deptId: deptId ?? '',
-          remark: remark ?? '',
-          createTime: createTime ?? '',
-          permissions: [],
-        });
-      });
-
-      if (rows.length === 0) {
-        toast.warning('No valid user data found');
-        return;
-      }
-
-      const hideLoading = toast.loading(
-        $t('ui.actionMessage.deleting', ['Importing users...']),
-        { duration: 0 },
-      );
-
-      await Promise.all(rows.map((user) => createUser(user)));
-
-      toast.dismiss(hideLoading);
-      toast.success(
-        $t('ui.actionMessage.operationSuccess', [rows.length.toString()]),
-      );
-      input.value = '';
-      onRefresh();
-    } catch (error) {
-      console.error('Import failed:', error);
-      toast.error($t('ui.actionMessage.operationFailed'));
-    }
-  })();
-
-  input.value = '';
-}
-
-function openImportFile() {
-  importFileInput.value?.click();
-}
 </script>
 
 <template>
@@ -361,17 +292,6 @@ function openImportFile() {
               <Download class="size-4 mr-1" />
               {{ $t('common.export') }}
             </Button>
-            <Button type="outline" @click="openImportFile" class="mr-2">
-              <ExternalLink class="size-4 mr-1" />
-              {{ $t('common.import') }}
-            </Button>
-            <input
-              ref="importFileInput"
-              type="file"
-              accept=".xlsx,.xls"
-              @change="handleImportFileChange"
-              class="hidden"
-            />
           </template>
           <template #action="{ row }">
             <VbenTableAction
