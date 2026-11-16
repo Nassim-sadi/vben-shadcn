@@ -15,7 +15,8 @@
     "edit": "Modify {0}",
     "create": "Create {0}",
     "delete": "Delete {0}",
-    "view": "View {0}"
+    "view": "View {0}",
+    "resetColumnWidth": "Reset column width"
   },
   "actionMessage": {
     "deleteConfirm": "Are you sure to delete {0}?",
@@ -248,9 +249,9 @@
         "client": "Client",
         "thirdParty": "Third-party",
         "other": "Other",
-      "seriesVisit": "Visit",
-      "seriesTrend": "Trend",
-      "ipad": "iPad"
+        "seriesVisit": "Visit",
+        "seriesTrend": "Trend",
+        "ipad": "iPad"
       },
       "analyticsVisitsSales": {
         "outsourcing": "Outsourcing",

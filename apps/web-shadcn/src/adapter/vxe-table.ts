@@ -17,6 +17,8 @@ import {
 import { useDictStore } from '@vben/stores';
 import { get, isFunction, isString } from '@vben/utils';
 
+import { useTableColumnWidths } from './vxe-table/use-column-widths';
+
 import {
   Button,
   DropdownMenu,
@@ -404,10 +406,39 @@ export const useVbenVxeGrid = <
       TSubmitValues
     >
   >
-) =>
-  useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>(
+) => {
+  const options = rest[0] as Parameters<
+    typeof useGrid<
+      T,
+      ComponentType,
+      ComponentPropsMap,
+      TFormValues,
+      TSubmitValues
+    >
+  >[0];
+
+  const columnWidths = useTableColumnWidths();
+
+  if (options) {
+    if (options.gridOptions) {
+      const gridOptions = options.gridOptions;
+      if (Array.isArray(gridOptions.columns)) {
+        const persisted = columnWidths.applySavedWidths(
+          gridOptions.columns as any,
+        );
+        (gridOptions as any).columns = persisted;
+      }
+    }
+    options.gridEvents = {
+      ...options.gridEvents,
+      resizableChange: columnWidths.handleResize,
+    };
+  }
+
+  return useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>(
     ...rest,
   );
+};
 
 /**
  * 表格操作按钮组件
@@ -439,4 +470,5 @@ export type OnActionClickParams<T = Recordable<any>> = {
 export type OnActionClickFn<T = Recordable<any>> = (
   params: OnActionClickParams<T>,
 ) => void;
+export { useTableColumnWidths } from './vxe-table/use-column-widths';
 export type * from '@vben/plugins/vxe-table';

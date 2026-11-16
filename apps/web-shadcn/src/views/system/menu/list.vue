@@ -6,20 +6,20 @@ import type {
 
 import { toast } from 'vue-sonner';
 
-import { Page, useVbenDrawer } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 import { IconifyIcon, Plus } from '@vben/icons';
 import { $t } from '@vben/locales';
 
 import { MenuBadge } from '@vben-core/menu-ui';
 import { Button } from '@vben-core/shadcn-ui';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid, useTableColumnWidths } from '#/adapter/vxe-table';
 import { deleteMenu, getMenuList, SystemMenuApi } from '#/api/system/menu';
 
 import { useColumns } from './data';
 import Form from './modules/form.vue';
 
-const [FormDrawer, formDrawerApi] = useVbenDrawer({
+const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
@@ -56,6 +56,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
   } as VxeTableGridOptions,
 });
 
+const { resetWidths } = useTableColumnWidths();
+
 function onActionClick({
   code,
   row,
@@ -82,14 +84,20 @@ function onActionClick({
 function onRefresh() {
   gridApi.query();
 }
+
+function onResetColumnWidths() {
+  resetWidths();
+  gridApi.setGridOptions({ columns: useColumns(onActionClick) });
+  toast.success($t('common.reset'));
+}
 function onEdit(row: SystemMenuApi.SystemMenu) {
-  formDrawerApi.setData(row).open();
+  formModalApi.setData(row).open();
 }
 function onCreate() {
-  formDrawerApi.setData({}).open();
+  formModalApi.setData({}).open();
 }
 function onAppend(row: SystemMenuApi.SystemMenu) {
-  formDrawerApi.setData({ pid: row.id }).open();
+  formModalApi.setData({ pid: row.id }).open();
 }
 
 function onDelete(row: SystemMenuApi.SystemMenu) {
@@ -110,12 +118,16 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
 </script>
 <template>
   <Page auto-content-height>
-    <FormDrawer @success="onRefresh" />
+    <FormModal @success="onRefresh" />
     <Grid>
       <template #toolbar-tools>
         <Button @click="onCreate">
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.menu.name')]) }}
+        </Button>
+        <Button variant="ghost" @click="onResetColumnWidths">
+          <IconifyIcon class="size-5" icon="lucide:columns-3" />
+          {{ $t('ui.actionTitle.resetColumnWidth') }}
         </Button>
       </template>
       <template #title="{ row }">
