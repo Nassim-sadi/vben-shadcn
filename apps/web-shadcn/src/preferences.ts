@@ -14,6 +14,8 @@ export const overridesPreferences = defineOverridesPreferences({
     // 默认语言为英语；用户仍可在偏好设置中切换为中文
     locale: 'en-US',
     name: import.meta.env.VITE_APP_TITLE,
+    // 路由由后端 /menu/all 下发（按角色权限过滤），按钮由 /auth/codes 控制
+    accessMode: 'backend',
   },
   copyright: appCopyrightPreferences,
 });

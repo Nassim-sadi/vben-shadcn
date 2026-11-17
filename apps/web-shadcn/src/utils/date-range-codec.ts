@@ -4,6 +4,15 @@ import dayjs from 'dayjs';
 
 type DateRange = [Dayjs, Dayjs];
 
+/**
+ * Default search-form query range: yesterday → today.
+ * The backend treats endTime as inclusive (createDate < end + 1 day),
+ * so this covers a rolling 1-day window.
+ */
+export function defaultQueryRange(): DateRange {
+  return [dayjs().subtract(1, 'day'), dayjs()];
+}
+
 // 显式探测 any：任何与 any 的交叉都退化为 any，0 extends 1 & V 仅在
 // V 为 any 时成立。
 type IsAny<V> = 0 extends 1 & V ? true : false;

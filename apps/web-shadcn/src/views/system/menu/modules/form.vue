@@ -5,7 +5,7 @@ import type { VbenFormSchema } from '#/adapter/form';
 
 import { computed, h, ref } from 'vue';
 
-import { useVbenDrawer } from '@vben/common-ui';
+import { useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { $te } from '@vben/locales';
 import { getPopupContainer } from '@vben/utils';
@@ -32,46 +32,11 @@ const emit = defineEmits<{
 const formData = ref<SystemMenuApi.SystemMenu>();
 const titleSuffix = ref<string>();
 
-type MenuDrawerData =
+type MenuModalData =
   | SystemMenuApi.SystemMenu
   | { pid?: SystemMenuApi.SystemMenu['pid'] };
 type MenuSubmitValues = Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>;
-type MenuFormValues = MenuSubmitValues & { linkSrc?: string };
-
-function encodeMenuFormValues(
-  values: Readonly<MenuFormValues>,
-): MenuSubmitValues {
-  const { linkSrc, ...formValues } = values;
-  if (values.type === 'link') {
-    const meta = { ...values.meta, link: linkSrc };
-    Reflect.deleteProperty(meta, 'iframeSrc');
-    return {
-      ...formValues,
-      meta,
-    };
-  }
-  if (values.type === 'embedded') {
-    const meta = { ...values.meta, iframeSrc: linkSrc };
-    Reflect.deleteProperty(meta, 'link');
-    return {
-      ...formValues,
-      meta,
-    };
-  }
-  return formValues;
-}
-
-function decodeMenuFormValues(
-  values: Readonly<MenuSubmitValues>,
-): MenuFormValues {
-  let linkSrc: string | undefined;
-  if (values.type === 'link') {
-    linkSrc = values.meta?.link;
-  } else if (values.type === 'embedded') {
-    linkSrc = values.meta?.iframeSrc;
-  }
-  return { ...values, linkSrc };
-}
+type MenuFormValues = MenuSubmitValues;
 
 const schema: VbenFormSchema<MenuFormValues>[] = [
   {
@@ -168,7 +133,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     component: 'Input',
     dependencies: {
       show: (values) => {
-        return ['catalog', 'embedded', 'menu'].includes(values.type);
+        return ['catalog', 'menu'].includes(values.type);
       },
       triggerFields: ['type'],
     },
@@ -195,7 +160,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     component: 'Input',
     dependencies: {
       show: (values) => {
-        return ['embedded', 'menu'].includes(values.type);
+        return ['menu'].includes(values.type);
       },
       triggerFields: ['type'],
     },
@@ -218,7 +183,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     },
     dependencies: {
       show: (values) => {
-        return ['catalog', 'embedded', 'link', 'menu'].includes(values.type);
+        return ['catalog', 'menu'].includes(values.type);
       },
       triggerFields: ['type'],
     },
@@ -232,7 +197,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     },
     dependencies: {
       show: (values) => {
-        return ['catalog', 'embedded', 'menu'].includes(values.type);
+        return ['catalog', 'menu'].includes(values.type);
       },
       triggerFields: ['type'],
     },
@@ -264,23 +229,11 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
   {
     component: 'Input',
     dependencies: {
-      show: (values) => {
-        return ['embedded', 'link'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'linkSrc',
-    label: $t('system.menu.linkSrc'),
-    rules: z.url($t('ui.formRules.invalidURL')),
-  },
-  {
-    component: 'Input',
-    dependencies: {
       rules: (values) => {
         return values.type === 'button' ? 'required' : null;
       },
       show: (values) => {
-        return ['button', 'catalog', 'embedded', 'menu'].includes(values.type);
+        return ['button', 'catalog', 'menu'].includes(values.type);
       },
       triggerFields: ['type'],
     },
@@ -357,123 +310,12 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     fieldName: 'meta.badgeVariants',
     label: $t('system.menu.badgeVariants'),
   },
-  {
-    component: 'Divider',
-    dependencies: {
-      show: (values) => {
-        return !['button', 'link'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'divider1',
-    formItemClass: 'col-span-2 md:col-span-2 pb-0',
-    hideLabel: true,
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.advancedSettings'),
-      };
-    },
-  },
-  {
-    component: 'Checkbox',
-    dependencies: {
-      show: (values) => {
-        return ['menu'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'meta.keepAlive',
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.keepAlive'),
-      };
-    },
-  },
-  {
-    component: 'Checkbox',
-    dependencies: {
-      show: (values) => {
-        return ['embedded', 'menu'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'meta.affixTab',
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.affixTab'),
-      };
-    },
-  },
-  {
-    component: 'Checkbox',
-    dependencies: {
-      show: (values) => {
-        return !['button'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'meta.hideInMenu',
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.hideInMenu'),
-      };
-    },
-  },
-  {
-    component: 'Checkbox',
-    dependencies: {
-      show: (values) => {
-        return ['catalog', 'menu'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'meta.hideChildrenInMenu',
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.hideChildrenInMenu'),
-      };
-    },
-  },
-  {
-    component: 'Checkbox',
-    dependencies: {
-      show: (values) => {
-        return !['button', 'link'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'meta.hideInBreadcrumb',
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.hideInBreadcrumb'),
-      };
-    },
-  },
-  {
-    component: 'Checkbox',
-    dependencies: {
-      show: (values) => {
-        return !['button', 'link'].includes(values.type);
-      },
-      triggerFields: ['type'],
-    },
-    fieldName: 'meta.hideInTab',
-    renderComponentContent() {
-      return {
-        default: () => $t('system.menu.hideInTab'),
-      };
-    },
-  },
 ];
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const isHorizontal = computed(() => breakpoints.greaterOrEqual('md').value);
 
 const [Form, formApi] = useVbenForm({
-  codec: {
-    decode: decodeMenuFormValues,
-    encode: encodeMenuFormValues,
-  },
   commonConfig: {
     colon: true,
     formItemClass: 'col-span-2 md:col-span-1',
@@ -482,11 +324,11 @@ const [Form, formApi] = useVbenForm({
   showDefaultActions: false,
   wrapperClass: 'grid-cols-2 gap-x-4',
 });
-const [Drawer, drawerApi] = useVbenDrawer<MenuDrawerData>({
+const [Modal, modalApi] = useVbenModal<MenuModalData>({
   onConfirm: onSubmit,
   async onOpenChange(isOpen) {
     if (isOpen) {
-      const data = drawerApi.getData();
+      const data = modalApi.getData();
       if (data && 'id' in data) {
         formData.value = data;
         await formApi.setSubmitValues(data);
@@ -503,32 +345,32 @@ const [Drawer, drawerApi] = useVbenDrawer<MenuDrawerData>({
   },
 });
 
-defineExpose({ drawerApi });
+defineExpose({ modalApi });
 
 async function onSubmit() {
   const { valid } = await formApi.validate();
   if (valid) {
-    drawerApi.lock();
+    modalApi.lock();
     const data = await formApi.getValues();
     try {
       await (formData.value?.id
         ? updateMenu(formData.value.id, data)
         : createMenu(data));
-      drawerApi.close();
+      modalApi.close();
       emit('success');
     } finally {
-      drawerApi.unlock();
+      modalApi.unlock();
     }
   }
 }
-const getDrawerTitle = computed(() =>
+const getModalTitle = computed(() =>
   formData.value?.id
     ? $t('ui.actionTitle.edit', [$t('system.menu.name')])
     : $t('ui.actionTitle.create', [$t('system.menu.name')]),
 );
 </script>
 <template>
-  <Drawer class="w-full max-w-200" :title="getDrawerTitle">
+  <Modal class="w-full max-w-200" :title="getModalTitle">
     <Form class="mx-4" :layout="isHorizontal ? 'horizontal' : 'vertical'" />
-  </Drawer>
+  </Modal>
 </template>

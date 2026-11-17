@@ -9,6 +9,7 @@ import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { toast } from 'vue-sonner';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { useTabs } from '@vben/hooks';
 import { Plus } from '@vben/icons';
@@ -45,6 +46,8 @@ const [FormModal, formModalApi] = useVbenModal({
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
+    collapsed: true,
+    showCollapseButton: true,
     schema: useDataGridFormSchema(),
     submitOnChange: true,
   },
@@ -97,6 +100,8 @@ function onActionClick({
   }
 }
 
+const { hasAccessByCodes } = useAccess();
+
 function onCreate() {
   formModalApi.setData({ dictCode: dictCode.value }).open();
 }
@@ -139,7 +144,7 @@ function refreshGrid() {
         <Button class="mr-2" @click="onClose">
           {{ $t('preferences.tabbar.contextMenu.close') }}
         </Button>
-        <Button @click="onCreate">
+        <Button v-if="hasAccessByCodes(['SystemDict:create'])" @click="onCreate">
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.dict.label')]) }}
         </Button>

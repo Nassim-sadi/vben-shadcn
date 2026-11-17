@@ -6,6 +6,7 @@ import type {
 
 import { toast } from 'vue-sonner';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { IconifyIcon, Plus } from '@vben/icons';
 import { $t } from '@vben/locales';
@@ -93,6 +94,8 @@ function onResetColumnWidths() {
 function onEdit(row: SystemMenuApi.SystemMenu) {
   formModalApi.setData(row).open();
 }
+const { hasAccessByCodes } = useAccess();
+
 function onCreate() {
   formModalApi.setData({}).open();
 }
@@ -121,7 +124,7 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
     <FormModal @success="onRefresh" />
     <Grid>
       <template #toolbar-tools>
-        <Button @click="onCreate">
+        <Button v-if="hasAccessByCodes(['SystemMenu:create'])" @click="onCreate">
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.menu.name')]) }}
         </Button>

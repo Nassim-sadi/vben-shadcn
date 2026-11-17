@@ -2,7 +2,10 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn, VxeTableGridColumns } from '#/adapter/vxe-table';
 import type { SystemRoleApi } from '#/api';
 
+import { useAccess } from '@vben/access';
+
 import { $t } from '#/locales';
+import { defaultQueryRange } from '#/utils/date-range-codec';
 
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -10,6 +13,12 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'name',
       label: $t('system.role.roleName'),
+      rules: 'required',
+    },
+    {
+      component: 'Input',
+      fieldName: 'roleCode',
+      label: $t('system.role.roleCode'),
       rules: 'required',
     },
     {
@@ -31,13 +40,6 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'remark',
       label: $t('system.role.remark'),
     },
-    {
-      component: 'Input',
-      fieldName: 'permissions',
-      formItemClass: 'items-start',
-      label: $t('system.role.setPermissions'),
-      modelPropName: 'modelValue',
-    },
   ];
 }
 
@@ -45,10 +47,15 @@ export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
-      fieldName: 'name',
-      label: $t('system.role.roleName'),
+      fieldName: 'keyword',
+      label: $t('system.role.nameCode'),
     },
-    { component: 'Input', fieldName: 'id', label: $t('system.role.id') },
+    {
+      component: 'RangePicker',
+      defaultValue: defaultQueryRange(),
+      fieldName: 'createTime',
+      label: $t('system.role.createTime'),
+    },
     {
       component: 'Select',
       componentProps: {
@@ -66,11 +73,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'remark',
       label: $t('system.role.remark'),
     },
-    {
-      component: 'RangePicker',
-      fieldName: 'createTime',
-      label: $t('system.role.createTime'),
-    },
   ];
 }
 
@@ -78,6 +80,7 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
   onActionClick: OnActionClickFn<T>,
   onStatusChange?: (newStatus: any, row: T) => PromiseLike<boolean | undefined>,
 ): VxeTableGridColumns {
+  const { hasAccessByCodes } = useAccess();
   return [
     {
       field: 'name',
@@ -85,8 +88,8 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
       width: 200,
     },
     {
-      field: 'id',
-      title: $t('system.role.id'),
+      field: 'roleCode',
+      title: $t('system.role.roleCode'),
       width: 200,
     },
     {
@@ -117,11 +120,21 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
           onClick: onActionClick,
         },
         name: 'CellOperation',
+        options: [
+          { code: 'edit', show: () => hasAccessByCodes(['SystemRole:edit']) },
+          { code: 'detail', show: () => hasAccessByCodes(['SystemRole']) },
+          {
+            code: 'permissions',
+            text: $t('system.role.setPermissions'),
+            show: () => hasAccessByCodes(['SystemRole:setPermissions']),
+          },
+          { code: 'delete', show: () => hasAccessByCodes(['SystemRole:delete']) },
+        ],
       },
       field: 'operation',
       fixed: 'right',
       title: $t('system.role.operation'),
-      width: 130,
+      width: 220,
     },
   ];
 }

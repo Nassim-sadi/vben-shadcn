@@ -11,6 +11,7 @@ import { useDictStore } from '@vben/stores';
 import { getDeptList } from '#/api';
 import { Tag } from '#/components/ui/app';
 import { $t } from '#/locales';
+import { defaultQueryRange } from '#/utils/date-range-codec';
 
 const USER_GENDER_CODE = 'user_gender';
 
@@ -21,6 +22,12 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'name',
       label: $t('system.user.name'),
+      rules: 'required',
+    },
+    {
+      component: 'Input',
+      fieldName: 'userCode',
+      label: $t('system.user.userCode'),
       rules: 'required',
     },
     {
@@ -74,10 +81,15 @@ export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
-      fieldName: 'name',
-      label: $t('system.user.name'),
+      fieldName: 'keyword',
+      label: $t('system.user.nameCode'),
     },
-    { component: 'Input', fieldName: 'id', label: $t('system.user.id') },
+    {
+      component: 'RangePicker',
+      defaultValue: defaultQueryRange(),
+      fieldName: 'createTime',
+      label: $t('system.user.createTime'),
+    },
     {
       component: 'ApiSelect',
       componentProps: {
@@ -105,11 +117,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'remark',
       label: $t('system.user.remark'),
     },
-    {
-      component: 'RangePicker',
-      fieldName: 'createTime',
-      label: $t('system.user.createTime'),
-    },
   ];
 }
 
@@ -117,13 +124,12 @@ export function useGridFormSchema(): VbenFormSchema[] {
  * User details description list item
  * @param row User data
  */
-export function useDescriptionItems(
-  row?: SystemUserApi.SystemUser,
-): DescriptionsItemType[] {
+export function useDescriptionItems(row?: SystemUserApi.SystemUser): DescriptionsItemType[] {
   const dictStore = useDictStore();
   const enabled = row?.status === 1;
   return [
     { label: $t('system.user.name'), content: row?.name },
+    { label: $t('system.user.userCode'), content: row?.userCode },
     { label: $t('system.user.id'), content: row?.id },
     { label: $t('system.user.dept'), content: row?.deptId },
     {
@@ -139,8 +145,7 @@ export function useDescriptionItems(
             color: enabled ? 'success' : 'error',
           },
           {
-            default: () =>
-              enabled ? $t('common.enabled') : $t('common.disabled'),
+            default: () => (enabled ? $t('common.enabled') : $t('common.disabled')),
           },
         ),
     },
@@ -157,13 +162,18 @@ export function useColumns(
 ): VxeTableGridColumns {
   return [
     {
+      field: 'userCode',
+      title: $t('system.user.userCode'),
+      width: 200,
+    },
+    {
       field: 'name',
       title: $t('system.user.name'),
       width: 200,
     },
     {
-      field: 'id',
-      title: $t('system.user.id'),
+      field: 'roleCode',
+      title: $t('system.role.roleCode'),
       width: 200,
     },
     {

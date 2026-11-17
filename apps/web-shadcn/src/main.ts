@@ -1,4 +1,4 @@
-import { initPreferences } from '@vben/preferences';
+import { initPreferences, preferences, updatePreferences } from '@vben/preferences';
 import { unmountGlobalLoading } from '@vben/utils';
 
 import { overridesPreferences } from './preferences';
@@ -18,6 +18,18 @@ async function initApplication() {
     namespace,
     overrides: overridesPreferences,
   });
+
+  // accessMode 是结构性选择（菜单由后端 /menu/all 按角色下发），
+  // vben 的偏好缓存优先级高于 overrides，旧缓存会把 frontend 留在
+  // localStorage 里 —— 这里强制对齐 overrides，并把修正写回缓存。
+  if (
+    overridesPreferences.app?.accessMode &&
+    preferences.app.accessMode !== overridesPreferences.app.accessMode
+  ) {
+    updatePreferences({
+      app: { accessMode: overridesPreferences.app.accessMode },
+    });
+  }
 
   // Start the application and mount it
   // Vue application main logic and views

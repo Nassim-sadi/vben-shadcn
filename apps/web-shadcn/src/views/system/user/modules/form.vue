@@ -5,7 +5,7 @@ import type { SystemUserApi } from '#/api/system/user';
 
 import { computed, nextTick, ref } from 'vue';
 
-import { Tree, useVbenDrawer } from '@vben/common-ui';
+import { Tree, useVbenModal } from '@vben/common-ui';
 
 import { useVbenForm } from '#/adapter/form';
 import { getMenuList } from '#/api/system/menu';
@@ -32,34 +32,34 @@ const [Form, formApi] = useVbenForm({
 const permissions = ref<DataNode[]>([]);
 const loadingPermissions = ref(false);
 
-const id = ref();
-const [Drawer, drawerApi] = useVbenDrawer<null | SystemUserApi.SystemUser>({
+const userCode = ref();
+const [Modal, modalApi] = useVbenModal<null | SystemUserApi.SystemUser>({
   async onConfirm() {
     const { valid } = await formApi.validate();
     if (!valid) return;
     const values = await formApi.getValues();
-    drawerApi.lock();
-    (id.value ? updateUser(id.value, values) : createUser(values))
+    modalApi.lock();
+    (userCode.value ? updateUser(userCode.value, values) : createUser(values))
       .then(() => {
         emits('success');
-        drawerApi.close();
+        modalApi.close();
       })
       .catch(() => {
-        drawerApi.unlock();
+        modalApi.unlock();
       });
   },
 
   async onOpenChange(isOpen) {
     if (isOpen) {
-      const data = drawerApi.getData();
+      const data = modalApi.getData();
       formApi.reset();
 
       if (data) {
         formData.value = data;
-        id.value = data.id;
+        userCode.value = data.userCode;
       } else {
         formData.value = undefined;
-        id.value = undefined;
+        userCode.value = undefined;
       }
 
       if (permissions.value.length === 0) {
@@ -74,7 +74,7 @@ const [Drawer, drawerApi] = useVbenDrawer<null | SystemUserApi.SystemUser>({
   },
 });
 
-defineExpose({ drawerApi });
+defineExpose({ modalApi });
 
 async function loadPermissions() {
   loadingPermissions.value = true;
@@ -86,7 +86,7 @@ async function loadPermissions() {
   }
 }
 
-const getDrawerTitle = computed(() => {
+const getModalTitle = computed(() => {
   return formData.value?.id
     ? $t('common.edit', $t('system.user.name'))
     : $t('common.create', $t('system.user.name'));
@@ -102,7 +102,7 @@ function getNodeClass(node: Recordable<any>) {
 }
 </script>
 <template>
-  <Drawer :title="getDrawerTitle">
+  <Modal :title="getModalTitle">
     <Form>
       <template #permissions="slotProps">
         <Spin :spinning="loadingPermissions" class="w-full">
@@ -119,5 +119,5 @@ function getNodeClass(node: Recordable<any>) {
         </Spin>
       </template>
     </Form>
-  </Drawer>
+  </Modal>
 </template>

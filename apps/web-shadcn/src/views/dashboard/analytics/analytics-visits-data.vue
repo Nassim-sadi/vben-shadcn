@@ -28,9 +28,7 @@ onMounted(() => {
           name: $t('page.dashboard.analytics.analyticsVisitsData.mobile'),
         },
         {
-          name: $t(
-            'page.dashboard.analytics.analyticsVisitsData.ipad',
-          ),
+          name: $t('page.dashboard.analytics.analyticsVisitsData.ipad'),
         },
         {
           name: $t('page.dashboard.analytics.analyticsVisitsData.client'),

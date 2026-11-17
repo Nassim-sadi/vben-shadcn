@@ -273,6 +273,8 @@
         "operationAppend": "新增下级"
       },
       "role": {
+        "roleCode": "角色编码",
+        "roleName": "角色名称",
         "confirmStatus": "你要将{name}的状态切换为【{status}】吗？",
         "switchStatus": "切换状态"
       },

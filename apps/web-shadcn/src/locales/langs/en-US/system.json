@@ -5,6 +5,8 @@
     "list": "User List",
     "name": "User",
     "userName": "User Name",
+    "userCode": "User Code",
+    "nameCode": "Name / Code",
     "id": "User ID",
     "dept": "Department",
     "gender": "Gender",
@@ -12,7 +14,9 @@
     "remark": "Remark",
     "createTime": "Creation Time",
     "operation": "Operation",
-    "placeholder": "Search Department..."
+    "placeholder": "Search Department...",
+    "assignRole": "Assign Role",
+    "selectRole": "Select Role"
   },
   "dict": {
     "title": "Dictionary",
@@ -92,6 +96,8 @@
     "list": "Role List",
     "name": "Role",
     "roleName": "Role Name",
+    "roleCode": "Role Code",
+    "nameCode": "Name / Code",
     "id": "Role ID",
     "status": "Status",
     "remark": "Remark",

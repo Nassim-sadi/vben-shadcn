@@ -2,6 +2,8 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn, VxeTableGridColumns } from '#/adapter/vxe-table';
 import type { SystemDictApi } from '#/api';
 
+import { useAccess } from '@vben/access';
+
 import { z } from '#/adapter/form';
 import { isDictCodeExists } from '#/api';
 import { $t } from '#/locales';
@@ -125,6 +127,7 @@ export function useTypeFormSchema(
 export function useTypeColumns(
   onActionClick: OnActionClickFn<SystemDictApi.SystemDictType>,
 ): VxeTableGridColumns<SystemDictApi.SystemDictType> {
+  const { hasAccessByCodes } = useAccess();
   return [
     {
       field: 'name',
@@ -166,9 +169,16 @@ export function useTypeColumns(
           {
             code: 'data',
             text: $t('system.dict.data'),
+            show: () => hasAccessByCodes(['SystemDict']),
           },
-          'edit',
-          'delete',
+          {
+            code: 'edit',
+            show: () => hasAccessByCodes(['SystemDict:edit']),
+          },
+          {
+            code: 'delete',
+            show: () => hasAccessByCodes(['SystemDict:delete']),
+          },
         ],
       },
       field: 'operation',
@@ -285,6 +295,7 @@ export function useDataFormSchema(): VbenFormSchema[] {
 export function useDataColumns(
   onActionClick: OnActionClickFn<SystemDictApi.SystemDictData>,
 ): VxeTableGridColumns<SystemDictApi.SystemDictData> {
+  const { hasAccessByCodes } = useAccess();
   return [
     {
       field: 'label',
@@ -332,7 +343,10 @@ export function useDataColumns(
           onClick: onActionClick,
         },
         name: 'CellOperation',
-        options: ['edit', 'delete'],
+        options: [
+          { code: 'edit', show: () => hasAccessByCodes(['SystemDict:edit']) },
+          { code: 'delete', show: () => hasAccessByCodes(['SystemDict:delete']) },
+        ],
       },
       field: 'operation',
       fixed: 'right',

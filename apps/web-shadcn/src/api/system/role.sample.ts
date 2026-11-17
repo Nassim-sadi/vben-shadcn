@@ -11,15 +11,15 @@ import { getSampleMenuIds } from './menu.sample';
 type SystemRole = SystemRoleApi.SystemRole;
 
 const SAMPLE_SIZE = 8;
-const ROLE_NAMES = [
-  'Super Admin',
-  'System Admin',
-  'Production Manager',
-  'Warehouse Operator',
-  'Quality Inspector',
-  'Line Supervisor',
-  'Viewer',
-  'Maintenance',
+const ROLES: Array<{ code: string; name: string }> = [
+  { code: 'super-admin', name: 'Super Admin' },
+  { code: 'sys-admin', name: 'System Admin' },
+  { code: 'prod-manager', name: 'Production Manager' },
+  { code: 'wh-operator', name: 'Warehouse Operator' },
+  { code: 'qc-inspector', name: 'Quality Inspector' },
+  { code: 'line-supervisor', name: 'Line Supervisor' },
+  { code: 'viewer', name: 'Viewer' },
+  { code: 'maintenance', name: 'Maintenance' },
 ];
 
 let roleStore: SystemRole[] = [];
@@ -29,12 +29,13 @@ function buildInitialRoles(): SystemRole[] {
   const menuIds = getSampleMenuIds();
   const now = Date.now();
 
-  return ROLE_NAMES.map((name, index) => {
+  return ROLES.map((role, index) => {
     const created = new Date(now - (index + 1) * 24 * 60 * 60 * 1000);
     const permissionCount = Math.max(2, menuIds.length - index * 2);
     return {
       id: `sample-role-${index + 1}`,
-      name,
+      name: role.name,
+      roleCode: role.code,
       status: index === SAMPLE_SIZE - 1 ? 0 : 1,
       permissions: menuIds.slice(0, permissionCount),
       remark: index % 2 === 0 ? undefined : 'Auto generated role.',
@@ -46,6 +47,7 @@ function buildInitialRoles(): SystemRole[] {
 export interface SampleRoleQueryParams {
   [key: string]: any;
   endTime?: string;
+  keyword?: string;
   name?: string;
   page?: number | string;
   pageSize?: number | string;
@@ -56,6 +58,15 @@ export interface SampleRoleQueryParams {
 
 export function querySampleRoles(params: SampleRoleQueryParams = {}) {
   let filtered = [...roleStore];
+
+  if (params.keyword) {
+    const keyword = params.keyword.toLowerCase().trim();
+    filtered = filtered.filter(
+      (item) =>
+        item.name.toLowerCase().includes(keyword) ||
+        (item.roleCode ?? '').toLowerCase().includes(keyword),
+    );
+  }
 
   if (params.name) {
     const keyword = params.name.toLowerCase().trim();
@@ -113,6 +124,10 @@ export function deleteSampleRole(id: string): boolean {
   }
   roleStore.splice(index, 1);
   return true;
+}
+
+export function getSampleRoleCodes(): string[] {
+  return ROLES.map((role) => role.code);
 }
 
 roleStore = buildInitialRoles();

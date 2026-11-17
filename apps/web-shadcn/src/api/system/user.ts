@@ -18,6 +18,7 @@ export namespace SystemUserApi {
     permissions: string[];
     remark?: string;
     status: 0 | 1;
+    userCode: string;
   }
 }
 
@@ -31,10 +32,7 @@ async function getUserList(params: Recordable<any>) {
   if (USE_SAMPLE_DATA) {
     return querySampleUsers(params);
   }
-  return requestClient.get<Array<SystemUserApi.SystemUser>>(
-    '/system/user/list',
-    { params },
-  );
+  return requestClient.get<Array<SystemUserApi.SystemUser>>('/system/user/list', { params });
 }
 
 /**
@@ -45,7 +43,11 @@ async function createUser(data: Omit<SystemUserApi.SystemUser, 'id'>) {
   if (USE_SAMPLE_DATA) {
     return createSampleUser(data);
   }
-  return requestClient.post('/system/user', data);
+  const res = requestClient.post('/system/user', {
+    ...data,
+    id: data.userCode,
+  });
+  return res;
 }
 
 /**
@@ -54,25 +56,31 @@ async function createUser(data: Omit<SystemUserApi.SystemUser, 'id'>) {
  * @param id User ID
  * @param data User data
  */
-async function updateUser(
-  id: string,
-  data: Omit<SystemUserApi.SystemUser, 'id'>,
-) {
+async function updateUser(userCode: string, data: Omit<SystemUserApi.SystemUser, 'userCode'>) {
   if (USE_SAMPLE_DATA) {
-    return updateSampleUser(id, data);
+    return updateSampleUser(userCode, data);
   }
-  return requestClient.put(`/system/user/${id}`, data);
+  return requestClient.put(`/system/user/${userCode}`, data);
 }
 
 /**
  * Delete user
  * @param id User ID
  */
-async function deleteUser(id: string) {
+async function deleteUser(userCode: string) {
   if (USE_SAMPLE_DATA) {
-    return deleteSampleUser(id);
+    return deleteSampleUser(userCode);
   }
-  return requestClient.delete(`/system/user/${id}`);
+  return requestClient.delete(`/system/user/${userCode}`);
 }
 
-export { createUser, deleteUser, getUserList, updateUser };
+/**
+ * Assign role to user
+ * @param userCode User code
+ * @param roleCode Role code
+ */
+async function assignUserRole(userCode: string, roleCode: string) {
+  return requestClient.post(`/system/user/${userCode}/roles`, { roleCode });
+}
+
+export { assignUserRole, createUser, deleteUser, getUserList, updateUser };

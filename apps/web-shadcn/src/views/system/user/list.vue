@@ -9,8 +9,9 @@ import type { SystemDeptApi, SystemUserApi } from '#/api';
 import { onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
-import { Page, Tree, useVbenDrawer } from '@vben/common-ui';
-import { Download, ExternalLink, Plus } from '@vben/icons';
+import { useAccess } from '@vben/access';
+import { Page, Tree, useVbenModal } from '@vben/common-ui';
+import { Download, Plus } from '@vben/icons';
 
 import { confirm as vbenConfirm } from '@vben-core/popup-ui';
 import { Button } from '@vben-core/shadcn-ui';
@@ -18,18 +19,14 @@ import { Button } from '@vben-core/shadcn-ui';
 import ExcelJS from 'exceljs';
 
 import { useVbenVxeGrid, VbenTableAction } from '#/adapter/vxe-table';
-import {
-  createUser,
-  deleteUser,
-  getDeptList,
-  getUserList,
-  updateUser,
-} from '#/api';
+import { deleteUser, getDeptList, getUserList, updateUser } from '#/api';
 import { Card, InputSearch } from '#/components/ui/app';
+import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
 import { createDateRangeCodec } from '#/utils/date-range-codec';
 
 import { useColumns, useGridFormSchema } from './data';
+import AssignRole from './modules/assign-role.vue';
 import Detail from './modules/detail.vue';
 import Form from './modules/form.vue';
 
@@ -45,23 +42,31 @@ const userSearchCodec = createDateRangeCodec<UserSearchFormValues>()({
 
 type UserSearchSubmitValues = ReturnType<typeof userSearchCodec.encode>;
 
+const { hasAccessByCodes } = useAccess();
+
 const deptList = ref<SystemDeptApi.SystemDept[]>([]);
 const inputSearchValue = ref('');
 const selectedDeptId = ref<string>('');
-const importFileInput = ref<HTMLInputElement | null>(null);
 
-const [FormDrawer, formDrawerApi] = useVbenDrawer({
+const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
 
-const [DetailDrawer, detailDrawerApi] = useVbenDrawer({
+const [DetailModal, detailModalApi] = useVbenModal({
   connectedComponent: Detail,
+  destroyOnClose: true,
+});
+
+const [AssignRoleModal, assignRoleModalApi] = useVbenModal({
+  connectedComponent: AssignRole,
   destroyOnClose: true,
 });
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
+    collapsed: true,
+    showCollapseButton: true,
     codec: userSearchCodec,
     schema: useGridFormSchema(),
     submitOnChange: true,
@@ -70,6 +75,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
     columns: useColumns(onStatusChange),
     height: 'auto',
     keepSource: true,
+    pagerConfig: {
+      pageSize: TABLE.DEFAULT_PAGE_SIZE,
+    },
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues: UserSearchSubmitValues) => {
@@ -77,7 +85,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
             page: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
-            deptId: selectedDeptId.value,
+            deptId: selectedDeptId.value || undefined,
           });
         },
       },
@@ -127,7 +135,7 @@ async function onStatusChange(
       }),
       $t('page.system.user.switchStatus'),
     );
-    await updateUser(row.id, { status: newStatus });
+    await updateUser(row.userCode, { status: newStatus });
     return true;
   } catch {
     return false;
@@ -135,18 +143,18 @@ async function onStatusChange(
 }
 
 function onEdit(row: SystemUserApi.SystemUser) {
-  formDrawerApi.setData(row).open();
+  formModalApi.setData(row).open();
 }
 
 function onDetail(row: SystemUserApi.SystemUser) {
-  detailDrawerApi.setData(row).open();
+  detailModalApi.setData(row).open();
 }
 
 function onDelete(row: SystemUserApi.SystemUser) {
   const hideLoading = toast.loading(
     $t('ui.actionMessage.deleting', [row.name]),
   );
-  deleteUser(row.id)
+  deleteUser(row.userCode)
     .then(() => {
       toast.success($t('ui.actionMessage.deleteSuccess', [row.name]), {
         id: hideLoading,
@@ -163,22 +171,27 @@ function onRefresh() {
 }
 
 function onCreate() {
-  formDrawerApi.setData(null).open();
+  formModalApi.setData(null).open();
 }
 
 async function loadDeptList() {
   try {
     const res = await getDeptList();
-    console.log('Department list loaded:', res);
     deptList.value = res;
   } catch (error) {
     console.error('Failed to load department list:', error);
   }
 }
 
-function selectDept(v: string) {
-  selectedDeptId.value = v;
-  gridApi.query();
+/**
+ * The Tree select event passes a reka-ui FlattenedItem; the department id
+ * lives on `value` (the original node data). Clicking the selected node
+ * again (Tree has allow-clear) clears the department filter.
+ */
+function selectDept(v: any) {
+  const id = v?.value?.id ?? v?.id ?? '';
+  selectedDeptId.value = selectedDeptId.value === id ? '' : id;
+  gridApi.reload();
 }
 
 function searchDept(value: string) {
@@ -218,6 +231,7 @@ async function handleExport() {
     worksheet.columns = [
       { header: $t('system.user.id'), key: 'id', width: 30 },
       { header: $t('system.user.name'), key: 'name', width: 30 },
+      { header: $t('system.user.userCode'), key: 'userCode', width: 30 },
       { header: $t('system.user.gender'), key: 'gender', width: 15 },
       { header: $t('system.user.status'), key: 'status', width: 15 },
       { header: $t('system.user.dept'), key: 'deptId', width: 30 },
@@ -231,6 +245,7 @@ async function handleExport() {
       worksheet.addRow({
         id: user.id,
         name: user.name,
+        userCode: user.userCode ?? '',
         gender: user.gender ?? 0,
         status: statusLabel,
         deptId: user.deptId ?? '',
@@ -258,33 +273,41 @@ async function handleExport() {
     toast.error($t('ui.actionMessage.operationFailed'));
   }
 }
-
-
 </script>
 
 <template>
   <Page auto-content-height>
-    <FormDrawer @success="onRefresh" />
-    <DetailDrawer @success="onRefresh" />
+  <FormModal @success="onRefresh" />
+  <DetailModal />
+  <AssignRoleModal @success="onRefresh" />
     <div class="flex size-full">
-      <Card class="w-1/6">
-        <InputSearch
-          v-model:value="inputSearchValue"
-          :placeholder="$t('system.user.placeholder')"
-        />
-        <Tree
-          label-field="name"
-          value-field="id"
-          :tree-data="deptList"
-          :default-expanded-level="2"
-          @select="selectDept"
-        />
+      <Card class="dept-card w-1/6">
+        <div class="shrink-0">
+          <InputSearch
+            v-model="inputSearchValue"
+            :placeholder="$t('system.user.placeholder')"
+          />
+        </div>
+        <div class="min-h-0 flex-1 overflow-auto">
+          <Tree
+            label-field="name"
+            value-field="id"
+            allow-clear
+            :tree-data="deptList"
+            :default-expanded-level="2"
+            @select="selectDept"
+          />
+        </div>
       </Card>
 
       <div class="w-5/6 ml-4">
         <Grid :table-title="$t('system.user.list')">
           <template #toolbar-tools>
-            <Button @click="onCreate" class="mr-2">
+            <Button
+              v-if="hasAccessByCodes(['SystemUser:create'])"
+              @click="onCreate"
+              class="mr-2"
+            >
               <Plus class="size-5" />
               {{ $t('ui.actionTitle.create', [$t('system.user.name')]) }}
             </Button>
@@ -299,26 +322,34 @@ async function handleExport() {
                 {
                   text: $t('common.detail'),
                   icon: 'lucide:eye',
+                  auth: ['SystemUser'],
                   onClick: () => onDetail(row),
                 },
                 {
                   text: $t('common.edit'),
                   icon: 'lucide:edit',
+                  auth: ['SystemUser:edit'],
                   onClick: () => onEdit(row),
                 },
               ]"
-              :dropdown-actions="[
-                {
-                  text: $t('common.delete'),
-                  icon: 'lucide:trash-2',
-                  danger: true,
-                  popConfirm: {
-                    title: $t('ui.actionMessage.deleteConfirm', [row.name]),
-                    confirm: () => onDelete(row),
-                  },
-                  auth: ['AC_100100'],
-                },
-              ]"
+:dropdown-actions="[
+  {
+    text: $t('system.user.assignRole'),
+    icon: 'lucide:user-check',
+    auth: ['SystemUser:assignRole'],
+    onClick: () => assignRoleModalApi.setData(row).open(),
+  },
+  {
+    text: $t('common.delete'),
+    icon: 'lucide:trash-2',
+    danger: true,
+    auth: ['SystemUser:delete'],
+    popConfirm: {
+      title: $t('ui.actionMessage.deleteConfirm', [row.name]),
+      confirm: () => onDelete(row),
+    },
+  },
+]"
               align="center"
             />
           </template>
@@ -328,6 +359,12 @@ async function handleExport() {
   </Page>
 </template>
 
-<style>
-
+<style scoped>
+/* Keep the department card at full height with a scrollable tree area. */
+.dept-card :deep([data-slot='card-content']) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
 </style>

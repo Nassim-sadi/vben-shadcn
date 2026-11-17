@@ -55,19 +55,19 @@
     "@vben/utils": "workspace:*",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
-    "exceljs": "^4.4.0",
+    "exceljs": "catalog:",
+    "jsbarcode": "catalog:",
     "json-bigint": "catalog:",
     "pinia": "catalog:",
+    "qrcode": "catalog:",
     "reka-ui": "catalog:",
     "vue": "catalog:",
     "vue-router": "catalog:",
-    "vue-sonner": "catalog:",
-    "jsbarcode": "^3.11.0",
-    "qrcode": "^1.5.4"
+    "vue-sonner": "catalog:"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
     "@types/json-bigint": "catalog:",
-    "@types/qrcode": "^1.5.6"
+    "@types/qrcode": "catalog:"
   }
 }

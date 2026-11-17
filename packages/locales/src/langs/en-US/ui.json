@@ -273,6 +273,8 @@
         "operationAppend": "Add Sub-level"
       },
       "role": {
+        "roleCode": "Role Code",
+        "roleName": "Role Name",
         "confirmStatus": "Do you want to switch {name}'s status to {status}?",
         "switchStatus": "Switch Status"
       },

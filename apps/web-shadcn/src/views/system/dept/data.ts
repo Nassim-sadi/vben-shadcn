@@ -4,6 +4,8 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn } from '#/adapter/vxe-table';
 import type { SystemDeptApi } from '#/api/system/dept';
 
+import { useAccess } from '@vben/access';
+
 import { z } from '#/adapter/form';
 import { getDeptList } from '#/api/system/dept';
 import { $t } from '#/locales';
@@ -77,6 +79,7 @@ export function useSchema(): VbenFormSchema[] {
 export function useColumns(
   onActionClick?: OnActionClickFn<SystemDeptApi.SystemDept>,
 ): VxeTableGridColumns<SystemDeptApi.SystemDept> {
+  const { hasAccessByCodes } = useAccess();
   return [
     {
       align: 'left',
@@ -114,13 +117,15 @@ export function useColumns(
           {
             code: 'append',
             text: $t('system.menu.operationAppend'),
+            show: () => hasAccessByCodes(['SystemDept:create']),
           },
-          'edit', // 默认的编辑按钮
+          { code: 'edit', show: () => hasAccessByCodes(['SystemDept:edit']) },
           {
             code: 'delete', // 默认的删除按钮
             disabled: (row: SystemDeptApi.SystemDept) => {
               return !!(row.children && row.children.length > 0);
             },
+            show: () => hasAccessByCodes(['SystemDept:delete']),
           },
         ],
       },

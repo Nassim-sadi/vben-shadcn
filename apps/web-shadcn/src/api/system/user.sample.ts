@@ -2,6 +2,7 @@ import type { SystemUserApi } from './user';
 
 import { formatDateTime, inTimeRange, paginate } from '../sample-helpers';
 import { getSampleDeptIds } from './dept.sample';
+import { getSampleRoleCodes } from './role.sample';
 
 /**
  * Demo data for the user list, used when VITE_SYSTEM_SAMPLE=true.
@@ -41,6 +42,7 @@ const SAMPLE_SIZE = 24;
 
 function buildInitialUsers(): SystemUser[] {
   const deptIds = getSampleDeptIds();
+  const roleCodes = getSampleRoleCodes();
   const now = Date.now();
 
   return NAMES.map((name, index) => {
@@ -48,6 +50,8 @@ function buildInitialUsers(): SystemUser[] {
     return {
       id: `sample-user-${index + 1}`,
       name,
+      userCode: `UC-${String(index + 1).padStart(4, '0')}`,
+      roleCode: roleCodes[index % roleCodes.length] as string,
       gender: (index % 3) as 0 | 1 | 2,
       status: index % 4 === 3 ? 0 : 1,
       deptId: deptIds[index % deptIds.length] as string,
@@ -67,16 +71,27 @@ export interface SampleUserQueryParams {
   endTime?: string;
   gender?: number | string;
   id?: string;
+  keyword?: string;
   name?: string;
   page?: number | string;
   pageSize?: number | string;
   remark?: string;
   startTime?: string;
   status?: number | string;
+  userCode?: string;
 }
 
 export function querySampleUsers(params: SampleUserQueryParams = {}) {
   let filtered = [...userStore];
+
+  if (params.keyword) {
+    const keyword = params.keyword.toLowerCase().trim();
+    filtered = filtered.filter(
+      (item) =>
+        item.name.toLowerCase().includes(keyword) ||
+        item.userCode.toLowerCase().includes(keyword),
+    );
+  }
 
   if (params.name) {
     const keyword = params.name.toLowerCase().trim();
@@ -96,6 +111,13 @@ export function querySampleUsers(params: SampleUserQueryParams = {}) {
     const keyword = params.remark.toLowerCase().trim();
     filtered = filtered.filter(
       (item) => item.remark && item.remark.toLowerCase().includes(keyword),
+    );
+  }
+
+  if (params.userCode) {
+    const keyword = params.userCode.toLowerCase().trim();
+    filtered = filtered.filter((item) =>
+      item.userCode.toLowerCase().includes(keyword),
     );
   }
 

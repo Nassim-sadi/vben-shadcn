@@ -38,7 +38,7 @@ const formSchema = computed((): VbenFormSchema[] => {
 
 async function onSubmit(params: Recordable<any>) {
   authStore.authLogin(params).catch((error) => {
-      console.error('Login failed:', error);
+    console.error('Login failed:', error);
     // Login failed
   });
 }

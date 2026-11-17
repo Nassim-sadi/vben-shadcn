@@ -8,6 +8,7 @@ import type { SystemDictApi } from '#/api';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 import { useDictStore } from '@vben/stores';
@@ -32,6 +33,8 @@ const [FormModal, formModalApi] = useVbenModal({
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
+    collapsed: true,
+    showCollapseButton: true,
     schema: useTypeGridFormSchema(),
     submitOnChange: true,
   },
@@ -83,6 +86,8 @@ function onActionClick({
   }
 }
 
+const { hasAccessByCodes } = useAccess();
+
 function onCreate() {
   formModalApi.setData(null).open();
 }
@@ -133,7 +138,7 @@ function refreshGrid() {
     <FormModal @success="refreshGrid" />
     <Grid :table-title="$t('system.dict.list')">
       <template #toolbar-tools>
-        <Button @click="onCreate">
+        <Button v-if="hasAccessByCodes(['SystemDict:create'])" @click="onCreate">
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.dict.name')]) }}
         </Button>

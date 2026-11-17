@@ -1,6 +1,8 @@
 import type { OnActionClickFn, VxeTableGridColumns } from '#/adapter/vxe-table';
 import type { SystemMenuApi } from '#/api/system/menu';
 
+import { useAccess } from '@vben/access';
+
 import { $t } from '#/locales';
 
 export function getMenuTypeOptions() {
@@ -12,18 +14,13 @@ export function getMenuTypeOptions() {
     },
     { color: 'default', label: $t('system.menu.typeMenu'), value: 'menu' },
     { color: 'error', label: $t('system.menu.typeButton'), value: 'button' },
-    {
-      color: 'success',
-      label: $t('system.menu.typeEmbedded'),
-      value: 'embedded',
-    },
-    { color: 'warning', label: $t('system.menu.typeLink'), value: 'link' },
   ];
 }
 
 export function useColumns(
   onActionClick: OnActionClickFn<SystemMenuApi.SystemMenu>,
 ): VxeTableGridColumns<SystemMenuApi.SystemMenu> {
+  const { hasAccessByCodes } = useAccess();
   return [
     {
       align: 'left',
@@ -62,12 +59,6 @@ export function useColumns(
           case 'menu': {
             return row.component ?? '';
           }
-          case 'embedded': {
-            return row.meta?.iframeSrc ?? '';
-          }
-          case 'link': {
-            return row.meta?.link ?? '';
-          }
         }
         return '';
       },
@@ -93,9 +84,16 @@ export function useColumns(
           {
             code: 'append',
             text: $t('system.menu.operationAppend'),
+            show: () => hasAccessByCodes(['SystemMenu:create']),
           },
-          'edit', // Default edit button
-          'delete', // Default delete button
+          {
+            code: 'edit',
+            show: () => hasAccessByCodes(['SystemMenu:edit']),
+          },
+          {
+            code: 'delete',
+            show: () => hasAccessByCodes(['SystemMenu:delete']),
+          },
         ],
       },
       field: 'operation',

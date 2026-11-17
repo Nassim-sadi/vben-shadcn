@@ -97,4 +97,5 @@ The mock backend (`apps/backend-mock`) provides the following accounts:
 ## License
 
 Fork of [Vue Vben Admin](https://github.com/vbenjs/vue-vben-admin) (5.x), released under the [MIT License](./LICENSE).
+
 # vben-shadcn

@@ -7,6 +7,7 @@ import type { SystemDeptApi } from '#/api/system/dept';
 
 import { toast } from 'vue-sonner';
 
+import { useAccess } from '@vben/access';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 
@@ -23,6 +24,8 @@ const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
+
+const { hasAccessByCodes } = useAccess();
 
 /**
  * 编辑部门
@@ -132,7 +135,7 @@ function refreshGrid() {
     <FormModal @success="refreshGrid" />
     <Grid table-title="$t('system.dept.list')">
       <template #toolbar-tools>
-        <Button @click="onCreate">
+        <Button v-if="hasAccessByCodes(['SystemDept:create'])" @click="onCreate">
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.dept.name')]) }}
         </Button>
