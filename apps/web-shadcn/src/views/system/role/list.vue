@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import type { Dayjs } from 'dayjs';
 
-import type { Recordable } from '@vben/types';
-
 import type {
   OnActionClickParams,
   VxeTableGridOptions,
@@ -15,11 +13,10 @@ import { useAccess } from '@vben/access';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 
-import { confirm as vbenConfirm } from '@vben-core/popup-ui';
 import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { deleteRole, getRoleList, updateRole } from '#/api';
+import { deleteRole, getRoleList } from '#/api';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
 import { createDateRangeCodec } from '#/utils/date-range-codec';
@@ -67,7 +64,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useColumns(onActionClick, onStatusChange),
+    columns: useColumns(onActionClick),
     height: 'auto',
     keepSource: true,
     pagerConfig: {
@@ -116,44 +113,6 @@ function onActionClick(e: OnActionClickParams<SystemRoleApi.SystemRole>) {
       onPermissions(e.row);
       break;
     }
-  }
-}
-
-/**
- * Wraps vbenConfirm as a promise for easy use in async functions.
- * @param content Prompt content
- * @param title Prompt title
- */
-async function confirm(content: string, title: string) {
-  await vbenConfirm({ content, title });
-}
-
-/**
- * Status switch is about to change
- * @param newStatus Expected new status value
- * @param row Row data
- * @returns Returns false to abort the change, returns other values (undefined, true) to allow the change
- */
-async function onStatusChange(
-  newStatus: number,
-  row: SystemRoleApi.SystemRole,
-) {
-  const status: Recordable<string> = {
-    0: $t('common.disabled'),
-    1: $t('common.enabled'),
-  };
-  try {
-    await confirm(
-      $t('page.system.role.confirmStatus', {
-        name: row.name,
-        status: status[newStatus.toString()],
-      }),
-      $t('page.system.role.switchStatus'),
-    );
-    await updateRole(row.id, { status: newStatus });
-    return true;
-  } catch {
-    return false;
   }
 }
 

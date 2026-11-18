@@ -7,7 +7,7 @@ import { Tree, useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
 import { getMenuList } from '#/api/system/menu';
-import { updateRole } from '#/api/system/role';
+import { updateRolePermissions } from '#/api/system/role';
 import { Spin } from '#/components/ui/app';
 import { $t } from '#/locales';
 
@@ -28,9 +28,10 @@ const [Modal, modalApi] = useVbenModal<null | SystemRoleApi.SystemRole>({
     if (!role.value) return;
     modalApi.lock();
     try {
-      await updateRole(role.value.id, {
-        permissions: checkedKeys.value as string[],
-      });
+      await updateRolePermissions(
+        role.value.id,
+        checkedKeys.value as string[],
+      );
       modalApi.close();
       emit('success');
     } finally {

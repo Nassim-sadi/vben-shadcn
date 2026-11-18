@@ -65,6 +65,18 @@ async function updateRole(
 }
 
 /**
+ * Replace a role's permissions (separate permission code from role edit).
+ * @param id Role ID
+ * @param permissions Menu codes the role should be granted
+ */
+async function updateRolePermissions(id: string, permissions: string[]) {
+  if (USE_SAMPLE_DATA) {
+    return updateSampleRole(id, { permissions });
+  }
+  return requestClient.put(`/system/role/${id}/permissions`, { permissions });
+}
+
+/**
  * Delete role
  * @param id Role ID
  */
@@ -75,4 +87,10 @@ async function deleteRole(id: string) {
   return requestClient.delete(`/system/role/${id}`);
 }
 
-export { createRole, deleteRole, getRoleList, updateRole };
+export {
+  createRole,
+  deleteRole,
+  getRoleList,
+  updateRole,
+  updateRolePermissions,
+};
