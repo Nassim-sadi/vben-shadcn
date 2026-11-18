@@ -61,6 +61,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
       .max(30, $t('ui.formRules.maxLength', [$t('system.menu.menuName'), 30]))
       .refine(
         async (value: string) => {
+          if (!value) return true;
           return !(await isMenuNameExists(value, formData.value?.id));
         },
         {
@@ -130,6 +131,16 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     rules: 'required',
   },
   {
+    component: 'InputNumber',
+    componentProps: {
+      class: 'w-full',
+      min: 0,
+    },
+    defaultValue: 0,
+    fieldName: 'meta.order',
+    label: $t('system.menu.sort'),
+  },
+  {
     component: 'Input',
     dependencies: {
       show: (values) => {
@@ -145,6 +156,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
       .max(100, $t('ui.formRules.maxLength', [$t('system.menu.path'), 100]))
       .refine(
         async (value: string) => {
+          if (!value) return true;
           return !(await isMenuPathExists(value, formData.value?.id));
         },
         {
@@ -164,7 +176,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
       },
       triggerFields: ['type'],
     },
-    fieldName: 'activePath',
+    fieldName: 'meta.activePath',
     help: $t('system.menu.activePathHelp'),
     label: $t('system.menu.activePath'),
     rules: z
@@ -172,6 +184,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
       .min(2, $t('ui.formRules.minLength', [$t('system.menu.path'), 2]))
       .max(100, $t('ui.formRules.maxLength', [$t('system.menu.path'), 100]))
       .refine(async (value: string) => {
+        if (!value) return true;
         return await isMenuPathExists(value, formData.value?.id);
       }, $t('system.menu.activePathMustExist'))
       .optional(),
@@ -331,7 +344,8 @@ const [Modal, modalApi] = useVbenModal<MenuModalData>({
       const data = modalApi.getData();
       if (data && 'id' in data) {
         formData.value = data;
-        await formApi.setSubmitValues(data);
+        formApi.reset();
+        await formApi.setValues(data);
         titleSuffix.value = formData.value.meta?.title
           ? $t(formData.value.meta.title)
           : '';

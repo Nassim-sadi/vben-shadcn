@@ -70,6 +70,7 @@
     "component": "Component",
     "status": "Status",
     "authCode": "Auth Code",
+    "sort": "Sort",
     "badge": "Badge",
     "operation": "Operation",
     "linkSrc": "Link Address",
