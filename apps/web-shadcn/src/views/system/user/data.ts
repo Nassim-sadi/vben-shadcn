@@ -165,16 +165,19 @@ export function useColumns(
       field: 'userCode',
       title: $t('system.user.userCode'),
       width: 200,
+      sortable: true,
     },
     {
       field: 'name',
       title: $t('system.user.name'),
       width: 200,
+      sortable: true,
     },
     {
       field: 'roleCode',
       title: $t('system.role.roleCode'),
       width: 200,
+      sortable: true,
     },
     {
       cellRender: {
@@ -184,6 +187,7 @@ export function useColumns(
       field: 'gender',
       title: $t('system.user.gender'),
       width: 100,
+      sortable: true,
     },
     {
       cellRender: {
@@ -193,16 +197,19 @@ export function useColumns(
       field: 'status',
       title: $t('system.user.status'),
       width: 100,
+      sortable: true,
     },
     {
       field: 'remark',
       minWidth: 100,
       title: $t('system.user.remark'),
+      sortable: true,
     },
     {
       field: 'createTime',
       title: $t('system.user.createTime'),
       width: 200,
+      sortable: true,
     },
     {
       align: 'center',

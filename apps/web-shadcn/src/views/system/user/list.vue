@@ -20,7 +20,7 @@ import ExcelJS from 'exceljs';
 
 import { useVbenVxeGrid, VbenTableAction } from '#/adapter/vxe-table';
 import { deleteUser, getDeptList, getUserList, updateUser } from '#/api';
-import { Card, InputSearch } from '#/components/ui/app';
+import { Card, InputSearch, SortDropdown } from '#/components/ui/app';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
 import { createDateRangeCodec } from '#/utils/date-range-codec';
@@ -78,14 +78,20 @@ const [Grid, gridApi] = useVbenVxeGrid({
     pagerConfig: {
       pageSize: TABLE.DEFAULT_PAGE_SIZE,
     },
+    sortConfig: {
+      remote: true,
+    },
     proxyConfig: {
       ajax: {
-        query: async ({ page }, formValues: UserSearchSubmitValues) => {
+        query: async ({ page, sort }, formValues: UserSearchSubmitValues) => {
+          const sortArr = (sort as unknown) as Array<{ field?: string; order?: string }> | undefined;
           return await getUserList({
             page: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
             deptId: selectedDeptId.value || undefined,
+            sortBy: sortArr?.[0]?.field,
+            sortOrder: sortArr?.[0]?.order,
           });
         },
       },
@@ -315,6 +321,7 @@ async function handleExport() {
               <Download class="size-4 mr-1" />
               {{ $t('common.export') }}
             </Button>
+            <SortDropdown :gridApi="gridApi" />
           </template>
           <template #action="{ row }">
             <VbenTableAction

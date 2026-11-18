@@ -78,7 +78,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
 
 export function useColumns<T = SystemRoleApi.SystemRole>(
   onActionClick: OnActionClickFn<T>,
-  onStatusChange?: (newStatus: any, row: T) => PromiseLike<boolean | undefined>,
 ): VxeTableGridColumns {
   const { hasAccessByCodes } = useAccess();
   return [
@@ -92,15 +91,7 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
       title: $t('system.role.roleCode'),
       width: 200,
     },
-    {
-      cellRender: {
-        attrs: { beforeChange: onStatusChange },
-        name: onStatusChange ? 'CellSwitch' : 'CellTag',
-      },
-      field: 'status',
-      title: $t('system.role.status'),
-      width: 100,
-    },
+
     {
       field: 'remark',
       minWidth: 100,

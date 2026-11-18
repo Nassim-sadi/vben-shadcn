@@ -81,11 +81,11 @@ export function useColumns(
         },
         name: 'CellOperation',
         options: [
-          {
-            code: 'append',
-            text: $t('system.menu.operationAppend'),
-            show: () => hasAccessByCodes(['SystemMenu:create']),
-          },
+          // {
+          //   code: 'append',
+          //   text: $t('system.menu.operationAppend'),
+          //   show: () => hasAccessByCodes(['SystemMenu:create']),
+          // },
           {
             code: 'edit',
             show: () => hasAccessByCodes(['SystemMenu:edit']),

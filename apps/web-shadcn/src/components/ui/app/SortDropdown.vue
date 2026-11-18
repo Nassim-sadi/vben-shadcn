@@ -16,7 +16,7 @@ import {
 
 interface Props {
   /** The grid api from useVbenVxeGrid. */
-  gridApi: VxeGridApi<any>;
+  gridApi: VxeGridApi<any, any, any, any, any>;
   /** Column fields to hide from the menu (e.g. action columns). */
   exclude?: string[];
 }
@@ -63,8 +63,8 @@ const activeSort = ref<undefined | { field: string; order: string }>();
 function onOpenChange(isOpen: boolean) {
   open.value = isOpen;
   if (isOpen) {
-    const sortState = props.gridApi.grid?.getSortRecords?.() ?? [];
-    const first = sortState[0] as undefined | { field?: string; order?: string };
+    const sortState = (props.gridApi.grid?.sortConfig as Array<{ field?: string; order?: string }> | undefined) ?? [];
+    const first = sortState[0];
     activeSort.value =
       first?.field && first?.order
         ? { field: first.field, order: first.order }
