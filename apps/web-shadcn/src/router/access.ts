@@ -14,7 +14,10 @@ import { $t } from '#/locales';
 
 const forbiddenComponent = () => import('#/views/_core/fallback/forbidden.vue');
 
-async function generateAccess(options: GenerateMenuAndRoutesOptions) {
+async function generateAccess(
+  options: GenerateMenuAndRoutesOptions,
+  { silent = false }: { silent?: boolean } = {},
+) {
   const pageMap: ComponentRecordType = import.meta.glob('../views/**/*.vue');
 
   const layoutMap: ComponentRecordType = {
@@ -29,10 +32,13 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
       console.log('[menu-access] fetchMenuListAsync start', {
         at: new Date().toISOString(),
         href: location.href,
+        silent,
       });
-      const toastId = toast.loading(`${$t('common.loadingMenu')}...`, {
-        duration: 1500,
-      });
+      const toastId = silent
+        ? undefined
+        : toast.loading(`${$t('common.loadingMenu')}...`, {
+            duration: 1500,
+          });
       try {
         const menus = await getAllMenusApi();
         console.log('[menu-access] fetchMenuListAsync success', {
@@ -53,7 +59,9 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
           durationMs: Date.now() - startedAt,
           toastId,
         });
-        toast.dismiss(toastId);
+        if (toastId) {
+          toast.dismiss(toastId);
+        }
       }
     },
     // You can specify that you do not have permission to jump to the 403 page.

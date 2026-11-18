@@ -134,9 +134,9 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     component: 'InputNumber',
     componentProps: {
       class: 'w-full',
-      min: 0,
+      min: 1,
     },
-    defaultValue: 0,
+    defaultValue: 1,
     fieldName: 'meta.order',
     label: $t('system.menu.sort'),
   },

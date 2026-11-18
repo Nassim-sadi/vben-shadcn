@@ -16,6 +16,7 @@ import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid, useTableColumnWidths } from '#/adapter/vxe-table';
 import { deleteMenu, getMenuList, SystemMenuApi } from '#/api/system/menu';
+import { refreshAccessibleRoutes } from '#/router/refresh';
 
 import { useColumns } from './data';
 import Form from './modules/form.vue';
@@ -86,6 +87,14 @@ function onRefresh() {
   gridApi.query();
 }
 
+async function onMenuChanged() {
+  onRefresh();
+  // Menu metadata (icon, activeIcon, order, etc.) is baked into the
+  // accessible routes when the guard first runs. Rebuild them in place so
+  // the sidebar/header/tabs update without a full page reload.
+  await refreshAccessibleRoutes();
+}
+
 function onResetColumnWidths() {
   resetWidths();
   gridApi.setGridOptions({ columns: useColumns(onActionClick) });
@@ -112,7 +121,7 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
       toast.success($t('ui.actionMessage.deleteSuccess', [row.name]), {
         id: hideLoading,
       });
-      onRefresh();
+      onMenuChanged();
     })
     .catch(() => {
       toast.dismiss(hideLoading);
@@ -121,7 +130,7 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
 </script>
 <template>
   <Page auto-content-height>
-    <FormModal @success="onRefresh" />
+    <FormModal @success="onMenuChanged" />
     <Grid>
       <template #toolbar-tools>
         <Button v-if="hasAccessByCodes(['SystemMenu:create'])" @click="onCreate">

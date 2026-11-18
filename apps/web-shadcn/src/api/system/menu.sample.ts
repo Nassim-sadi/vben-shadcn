@@ -58,7 +58,7 @@ function buildInitialTree(): SystemMenu[] {
       type: 'catalog',
       meta: {
         icon: 'lucide:layout-dashboard',
-        order: -1,
+        order: 1,
         title: 'page.dashboard.title',
       },
       redirect: '/dashboard/analytics',
