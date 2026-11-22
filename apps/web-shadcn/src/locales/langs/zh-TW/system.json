@@ -26,7 +26,16 @@
     "operation": "操作",
     "placeholder": "搜尋部門...",
     "assignRole": "分配角色",
-    "selectRole": "選擇角色"
+    "selectRole": "選擇角色",
+    "lock": "鎖定",
+    "unlock": "解鎖",
+    "exportTitle": "正在匯出使用者",
+    "exportProgress": "已匯出 {loaded} / {total}",
+    "exportAbort": "中止匯出",
+    "exportAbortConfirm": "確定要中止匯出嗎？已匯出的進度將遺失。",
+    "exportClose": "關閉",
+    "exportAborted": "匯出已中止",
+    "exportFailed": "匯出失敗"
   },
   "dict": {
     "title": "字典管理",

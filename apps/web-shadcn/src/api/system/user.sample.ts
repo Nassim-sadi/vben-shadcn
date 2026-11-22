@@ -75,7 +75,6 @@ export interface SampleUserQueryParams {
   name?: string;
   page?: number | string;
   pageSize?: number | string;
-  remark?: string;
   startTime?: string;
   status?: number | string;
   userCode?: string;
@@ -107,13 +106,6 @@ export function querySampleUsers(params: SampleUserQueryParams = {}) {
     );
   }
 
-  if (params.remark) {
-    const keyword = params.remark.toLowerCase().trim();
-    filtered = filtered.filter(
-      (item) => item.remark && item.remark.toLowerCase().includes(keyword),
-    );
-  }
-
   if (params.userCode) {
     const keyword = params.userCode.toLowerCase().trim();
     filtered = filtered.filter((item) =>
@@ -138,6 +130,44 @@ export function querySampleUsers(params: SampleUserQueryParams = {}) {
   );
 
   return paginate(filtered, params.page, params.pageSize);
+}
+
+/** Mirrors GET /system/user/export-page for the sample-data environment. */
+export function querySampleUserExportPage(after?: string, limit?: number) {
+  const size = Math.min(Math.max(limit ?? 500, 1), 1000);
+  const cursor = after ?? '';
+  const sorted = [...userStore].sort((a, b) => a.userCode.localeCompare(b.userCode));
+  const found = cursor
+    ? sorted.findIndex((item) => item.userCode.localeCompare(cursor) > 0)
+    : 0;
+  const start = found < 0 ? sorted.length : found;
+  const items = sorted.slice(start, start + size);
+  const hasMore = start + items.length < sorted.length;
+
+  return {
+    hasMore,
+    items: items.map(
+      (item): SystemUserApi.SystemUserExport => ({
+        createTime: item.createTime,
+        createUserName: 'Sample',
+        deptCode: item.deptId ?? '',
+        gender: item.gender ?? 0,
+        id: item.id,
+        mobile: item.mobile,
+        name: item.name,
+        photoPath: item.photoPath,
+        remark: item.remark,
+        roleCode: item.roleCode ?? '',
+        roleName: item.roleCode ?? '',
+        status: item.status,
+        updateDate: item.updateDate,
+        updateUserName: item.updateUserName,
+        userCode: item.userCode,
+      }),
+    ),
+    nextAfter: hasMore ? (items[items.length - 1]?.userCode ?? null) : null,
+    total: cursor ? 0 : sorted.length,
+  } satisfies SystemUserApi.UserExportPage;
 }
 
 export function createSampleUser(data: Omit<SystemUser, 'id'>): SystemUser {

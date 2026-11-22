@@ -26,7 +26,16 @@
     "operation": "操作",
     "placeholder": "搜索部门...",
     "assignRole": "分配角色",
-    "selectRole": "选择角色"
+    "selectRole": "选择角色",
+    "lock": "锁定",
+    "unlock": "解锁",
+    "exportTitle": "正在导出用户",
+    "exportProgress": "已导出 {loaded} / {total}",
+    "exportAbort": "中止导出",
+    "exportAbortConfirm": "确定中止导出吗？已导出的进度将丢失。",
+    "exportClose": "关闭",
+    "exportAborted": "导出已中止",
+    "exportFailed": "导出失败"
   },
   "dict": {
     "title": "字典管理",

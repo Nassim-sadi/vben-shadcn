@@ -26,7 +26,16 @@
     "operation": "Operation",
     "placeholder": "Search Department...",
     "assignRole": "Assign Role",
-    "selectRole": "Select Role"
+    "selectRole": "Select Role",
+    "lock": "Lock",
+    "unlock": "Unlock",
+    "exportTitle": "Exporting Users",
+    "exportProgress": "Exported {loaded} of {total}",
+    "exportAbort": "Abort Export",
+    "exportAbortConfirm": "Abort the export? Exported progress will be lost.",
+    "exportClose": "Close",
+    "exportAborted": "Export aborted",
+    "exportFailed": "Export failed"
   },
   "dict": {
     "title": "Dictionary",

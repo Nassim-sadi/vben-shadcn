@@ -121,11 +121,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'status',
       label: $t('system.user.state'),
     },
-    {
-      component: 'Input',
-      fieldName: 'remark',
-      label: $t('system.user.remark'),
-    },
   ];
 }
 

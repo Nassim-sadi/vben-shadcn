@@ -4,7 +4,7 @@ import type { Recordable } from '@vben/types';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { SystemDeptApi, SystemUserApi } from '#/api';
 
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 import { useAccess } from '@vben/access';
@@ -12,12 +12,18 @@ import { Page, Tree, useVbenModal } from '@vben/common-ui';
 import { Download, Plus } from '@vben/icons';
 
 import { confirm as vbenConfirm } from '@vben-core/popup-ui';
-import { Button } from '@vben-core/shadcn-ui';
+import { Button, Progress } from '@vben-core/shadcn-ui';
 
 import ExcelJS from 'exceljs';
 
 import { useVbenVxeGrid, VbenTableAction } from '#/adapter/vxe-table';
-import { deleteUser, getDeptList, getUserList, updateUser } from '#/api';
+import {
+  deleteUser,
+  getDeptList,
+  getUserExportPage,
+  getUserList,
+  updateUser,
+} from '#/api';
 import { Card, InputSearch, SortDropdown } from '#/components/ui/app';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
@@ -59,10 +65,54 @@ const [AssignRoleModal, assignRoleModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
+const EXPORT_PAGE_SIZE = 500;
+
+type ExportStatus = 'idle' | 'running' | 'done' | 'aborted' | 'error';
+
+const exportState = ref<{
+  loaded: number;
+  message: string;
+  percent: number;
+  status: ExportStatus;
+  total: number;
+}>({
+  loaded: 0,
+  message: '',
+  percent: 0,
+  status: 'idle',
+  total: 0,
+});
+
+let exportController: AbortController | null = null;
+
+/**
+ * Guards every close path of the export modal. While the export is running,
+ * closing is only possible after confirming that the operation is aborted.
+ */
+async function requestExportClose() {
+  if (exportState.value.status !== 'running') {
+    return true;
+  }
+  if (!(await confirm($t('system.user.exportAbortConfirm'), $t('system.user.exportAbort')))) {
+    return false;
+  }
+  exportController?.abort();
+  return true;
+}
+
+const [ExportProgressModal, exportModalApi] = useVbenModal({
+  closable: false,
+  closeOnClickModal: false,
+  closeOnPressEscape: false,
+  showCancelButton: false,
+  showConfirmButton: false,
+  onBeforeClose: requestExportClose,
+});
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
-    collapsed: true,
-    showCollapseButton: true,
+    collapsed: false,
+    showCollapseButton: false,
     schema: useGridFormSchema(),
     submitOnChange: true,
   },
@@ -105,42 +155,47 @@ const [Grid, gridApi] = useVbenVxeGrid({
   } as VxeTableGridOptions<SystemUserApi.SystemUser>,
 });
 
-/**
- * Wraps vbenConfirm as a promise for easy use in async functions.
- * @param content Prompt content
- * @param title Prompt title
- */
+/** Returns true only when the user confirms the dialog. */
 async function confirm(content: string, title: string) {
-  await vbenConfirm({ content, title });
-}
-
-/**
- * Status switch is about to change
- * @param newStatus Expected new status value
- * @param row Row data
- * @returns Returns false to abort the change, returns other values (undefined, true) to allow the change
- */
-async function onStatusChange(
-  newStatus: number,
-  row: SystemUserApi.SystemUser,
-) {
-  const status: Recordable<string> = {
-    0: $t('common.disabled'),
-    1: $t('common.enabled'),
-  };
   try {
-    await confirm(
-      $t('page.system.user.confirmStatus', {
-        name: row.name,
-        status: status[newStatus.toString()],
-      }),
-      $t('page.system.user.switchStatus'),
-    );
-    await updateUser(row.userCode, { status: newStatus });
+    await vbenConfirm({ content, title });
     return true;
   } catch {
     return false;
   }
+}
+
+/** Shared by the State switch and the Lock/Unlock row actions. */
+async function setUserStatus(
+  row: SystemUserApi.SystemUser,
+  status: 0 | 1,
+): Promise<boolean> {
+  const statusLabel = status === 1 ? $t('common.enabled') : $t('common.disabled');
+  if (
+    !(await confirm(
+      $t('page.system.user.confirmStatus', {
+        name: row.name,
+        status: statusLabel,
+      }),
+      $t('page.system.user.switchStatus'),
+    ))
+  ) {
+    return false;
+  }
+
+  try {
+    await updateUser(row.userCode, { status });
+    row.status = status;
+    onRefresh();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** CellSwitch hook: return false to keep the old value. */
+async function onStatusChange(newStatus: number, row: SystemUserApi.SystemUser) {
+  return await setUserStatus(row, newStatus === 1 ? 1 : 0);
 }
 
 function onEdit(row: SystemUserApi.SystemUser) {
@@ -214,21 +269,58 @@ watch(inputSearchValue, (value) => {
   searchDept(value);
 });
 
+/**
+ * Exports every non-deleted user (no filters) in sequential keyset pages.
+ * The browser does the XLSX work, so the server only sees small paged reads.
+ */
 async function handleExport() {
+  if (exportState.value.status === 'running') {
+    return;
+  }
+
+  const controller = new AbortController();
+  exportController = controller;
+  exportState.value = {
+    loaded: 0,
+    message: '',
+    percent: 0,
+    status: 'running',
+    total: 0,
+  };
+  exportModalApi.open();
+
+  const users: SystemUserApi.SystemUserExport[] = [];
+  let after = '';
+
   try {
-    const res = await getUserList({
-      page: 1,
-      pageSize: 9999,
-      deptId: selectedDeptId.value,
-    });
-    const users = Array.isArray(res)
-      ? res
-      : (((res as Record<string, unknown>)?.items ??
-          []) as SystemUserApi.SystemUser[]);
+    while (true) {
+      if (controller.signal.aborted) {
+        throw new DOMException('Export aborted', 'AbortError');
+      }
+
+      const page = await getUserExportPage(
+        { after, limit: EXPORT_PAGE_SIZE },
+        controller.signal,
+      );
+      if (page.total > 0) {
+        exportState.value.total = page.total;
+      }
+      users.push(...page.items);
+      exportState.value.loaded = users.length;
+      exportState.value.percent =
+        exportState.value.total > 0
+          ? Math.min(100, Math.round((users.length / exportState.value.total) * 100))
+          : 0;
+      await nextTick();
+
+      if (!page.hasMore || !page.nextAfter) {
+        break;
+      }
+      after = page.nextAfter;
+    }
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Users');
-
     worksheet.columns = [
       { header: $t('system.user.id'), key: 'id', width: 30 },
       { header: $t('system.user.name'), key: 'name', width: 30 },
@@ -247,20 +339,18 @@ async function handleExport() {
       { header: $t('system.user.updateTime'), key: 'updateDate', width: 30 },
     ];
 
-    users.forEach((user: SystemUserApi.SystemUser) => {
-      const statusLabel =
-        user.status === 1 ? $t('common.enabled') : $t('common.disabled');
+    users.forEach((user) => {
       worksheet.addRow({
         id: user.id,
         name: user.name,
         userCode: user.userCode ?? '',
         roleName: user.roleName ?? '',
         roleCode: user.roleCode ?? '',
-        deptCode: user.deptId ?? '',
+        deptCode: user.deptCode ?? '',
         mobile: user.mobile ?? '',
         photoPath: user.photoPath ?? '',
         gender: user.gender ?? 0,
-        state: statusLabel,
+        state: user.status === 1 ? $t('common.enabled') : $t('common.disabled'),
         remark: user.remark ?? '',
         createUserName: user.createUserName ?? '',
         createTime: user.createTime ?? '',
@@ -282,19 +372,59 @@ async function handleExport() {
     link.remove();
     URL.revokeObjectURL(url);
 
+    exportState.value.percent = 100;
+    exportState.value.status = 'done';
+    await nextTick();
+    await exportModalApi.close();
     toast.success($t('ui.actionMessage.operationSuccess'));
   } catch (error) {
+    if (controller.signal.aborted) {
+      exportState.value.status = 'aborted';
+      await exportModalApi.close();
+      toast($t('system.user.exportAborted'));
+      return;
+    }
     console.error('Export failed:', error);
-    toast.error($t('ui.actionMessage.operationFailed'));
+    exportState.value.status = 'error';
+    exportState.value.message = $t('system.user.exportFailed');
+  } finally {
+    exportController = null;
   }
 }
 </script>
 
 <template>
   <Page auto-content-height>
-  <FormModal @success="onRefresh" />
-  <DetailModal />
-  <AssignRoleModal @success="onRefresh" />
+    <FormModal @success="onRefresh" />
+    <DetailModal />
+    <AssignRoleModal @success="onRefresh" />
+    <ExportProgressModal :title="$t('system.user.exportTitle')">
+      <div class="space-y-3 px-1 py-2">
+        <Progress :model-value="exportState.percent" :max="100" />
+        <div class="text-muted-foreground text-sm">
+          {{
+            $t('system.user.exportProgress', {
+              loaded: exportState.loaded,
+              total: exportState.total || '…',
+            })
+          }}
+        </div>
+        <div v-if="exportState.message" class="text-destructive text-sm">
+          {{ exportState.message }}
+        </div>
+      </div>
+      <template #footer>
+        <div class="flex justify-end p-2">
+          <Button type="outline" @click="exportModalApi.close()">
+            {{
+              exportState.status === 'running'
+                ? $t('system.user.exportAbort')
+                : $t('system.user.exportClose')
+            }}
+          </Button>
+        </div>
+      </template>
+    </ExportProgressModal>
     <div class="flex size-full">
       <Card class="dept-card w-1/6">
         <div class="shrink-0">
@@ -349,6 +479,20 @@ async function handleExport() {
                 },
               ]"
 :dropdown-actions="[
+  {
+    text: $t('system.user.lock'),
+    icon: 'lucide:lock',
+    auth: ['SystemUser:edit'],
+    disabled: row.status === 0,
+    onClick: () => setUserStatus(row, 0),
+  },
+  {
+    text: $t('system.user.unlock'),
+    icon: 'lucide:lock-open',
+    auth: ['SystemUser:edit'],
+    disabled: row.status === 1,
+    onClick: () => setUserStatus(row, 1),
+  },
   {
     text: $t('system.user.assignRole'),
     icon: 'lucide:user-check',
