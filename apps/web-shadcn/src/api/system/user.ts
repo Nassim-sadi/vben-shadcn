@@ -12,12 +12,23 @@ import {
 export namespace SystemUserApi {
   export interface SystemUser {
     [key: string]: any;
+    createTime?: string;
+    createUserCode?: string;
+    createUserName?: string;
+    deptId?: string;
     gender?: 0 | 1 | 2;
     id: string;
+    mobile?: string;
     name: string;
     permissions: string[];
+    photoPath?: string;
     remark?: string;
+    roleCode?: string;
+    roleName?: string;
     status: 0 | 1;
+    updateDate?: string;
+    updateUserCode?: string;
+    updateUserName?: string;
     userCode: string;
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Dayjs } from 'dayjs';
+import type { Recordable } from '@vben/types';
 
 import type {
   OnActionClickParams,
@@ -19,24 +19,11 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteRole, getRoleList } from '#/api';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
-import { createDateRangeCodec } from '#/utils/date-range-codec';
 
 import { useColumns, useGridFormSchema } from './data';
 import Detail from './modules/detail.vue';
 import Form from './modules/form.vue';
 import Permissions from './modules/permissions.vue';
-
-interface RoleSearchFormValues extends Record<string, unknown> {
-  createTime?: [Dayjs, Dayjs];
-}
-
-const roleSearchCodec = createDateRangeCodec<RoleSearchFormValues>()({
-  endField: 'endTime',
-  rangeField: 'createTime',
-  startField: 'startTime',
-});
-
-type RoleSearchSubmitValues = ReturnType<typeof roleSearchCodec.encode>;
 
 const { hasAccessByCodes } = useAccess();
 
@@ -59,7 +46,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: true,
     showCollapseButton: true,
-    codec: roleSearchCodec,
     schema: useGridFormSchema(),
     submitOnChange: true,
   },
@@ -72,7 +58,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     proxyConfig: {
       ajax: {
-        query: async ({ page }, formValues: RoleSearchSubmitValues) => {
+        query: async ({ page }, formValues: Recordable<any>) => {
           return await getRoleList({
             page: page.currentPage,
             pageSize: page.pageSize,

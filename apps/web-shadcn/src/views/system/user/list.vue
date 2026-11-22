@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import type { Dayjs } from 'dayjs';
-
 import type { Recordable } from '@vben/types';
 
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { SystemDeptApi, SystemUserApi } from '#/api';
 
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 import { useAccess } from '@vben/access';
@@ -23,28 +21,26 @@ import { deleteUser, getDeptList, getUserList, updateUser } from '#/api';
 import { Card, InputSearch, SortDropdown } from '#/components/ui/app';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
-import { createDateRangeCodec } from '#/utils/date-range-codec';
 
 import { useColumns, useGridFormSchema } from './data';
 import AssignRole from './modules/assign-role.vue';
 import Detail from './modules/detail.vue';
 import Form from './modules/form.vue';
 
-interface UserSearchFormValues extends Record<string, unknown> {
-  createTime?: [Dayjs, Dayjs];
-}
-
-const userSearchCodec = createDateRangeCodec<UserSearchFormValues>()({
-  endField: 'endTime',
-  rangeField: 'createTime',
-  startField: 'startTime',
-});
-
-type UserSearchSubmitValues = ReturnType<typeof userSearchCodec.encode>;
-
 const { hasAccessByCodes } = useAccess();
 
 const deptList = ref<SystemDeptApi.SystemDept[]>([]);
+const deptTreeData = computed(() => {
+  const withCodes = (
+    nodes: SystemDeptApi.SystemDept[],
+  ): SystemDeptApi.SystemDept[] =>
+    nodes.map((node) => ({
+      ...node,
+      name: node.id ? `${node.name} (${node.id})` : node.name,
+      children: node.children?.length ? withCodes(node.children) : [],
+    }));
+  return withCodes(deptList.value);
+});
 const inputSearchValue = ref('');
 const selectedDeptId = ref<string>('');
 
@@ -67,7 +63,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: true,
     showCollapseButton: true,
-    codec: userSearchCodec,
     schema: useGridFormSchema(),
     submitOnChange: true,
   },
@@ -83,7 +78,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     proxyConfig: {
       ajax: {
-        query: async ({ page, sort }, formValues: UserSearchSubmitValues) => {
+        query: async ({ page, sort }, formValues: Recordable<any>) => {
           const sortArr = (sort as unknown) as Array<{ field?: string; order?: string }> | undefined;
           return await getUserList({
             page: page.currentPage,
@@ -238,11 +233,18 @@ async function handleExport() {
       { header: $t('system.user.id'), key: 'id', width: 30 },
       { header: $t('system.user.name'), key: 'name', width: 30 },
       { header: $t('system.user.userCode'), key: 'userCode', width: 30 },
+      { header: $t('system.role.roleName'), key: 'roleName', width: 24 },
+      { header: $t('system.role.roleCode'), key: 'roleCode', width: 24 },
+      { header: $t('system.user.deptCode'), key: 'deptCode', width: 30 },
+      { header: $t('system.user.mobile'), key: 'mobile', width: 24 },
+      { header: $t('system.user.photoPath'), key: 'photoPath', width: 30 },
       { header: $t('system.user.gender'), key: 'gender', width: 15 },
-      { header: $t('system.user.status'), key: 'status', width: 15 },
-      { header: $t('system.user.dept'), key: 'deptId', width: 30 },
+      { header: $t('system.user.state'), key: 'state', width: 15 },
       { header: $t('system.user.remark'), key: 'remark', width: 40 },
+      { header: $t('system.user.createUser'), key: 'createUserName', width: 24 },
       { header: $t('system.user.createTime'), key: 'createTime', width: 30 },
+      { header: $t('system.user.updateUser'), key: 'updateUserName', width: 24 },
+      { header: $t('system.user.updateTime'), key: 'updateDate', width: 30 },
     ];
 
     users.forEach((user: SystemUserApi.SystemUser) => {
@@ -252,11 +254,18 @@ async function handleExport() {
         id: user.id,
         name: user.name,
         userCode: user.userCode ?? '',
+        roleName: user.roleName ?? '',
+        roleCode: user.roleCode ?? '',
+        deptCode: user.deptId ?? '',
+        mobile: user.mobile ?? '',
+        photoPath: user.photoPath ?? '',
         gender: user.gender ?? 0,
-        status: statusLabel,
-        deptId: user.deptId ?? '',
+        state: statusLabel,
         remark: user.remark ?? '',
+        createUserName: user.createUserName ?? '',
         createTime: user.createTime ?? '',
+        updateUserName: user.updateUserName ?? '',
+        updateDate: user.updateDate ?? '',
       });
     });
 
@@ -299,7 +308,7 @@ async function handleExport() {
             label-field="name"
             value-field="id"
             allow-clear
-            :tree-data="deptList"
+            :tree-data="deptTreeData"
             :default-expanded-level="2"
             @select="selectDept"
           />

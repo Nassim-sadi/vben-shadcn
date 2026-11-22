@@ -2,7 +2,6 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridColumns } from '#/adapter/vxe-table';
 import type { SystemLogApi } from '#/api';
 
-import { defaultQueryRange } from '#/utils/date-range-codec';
 import { $t } from '#/locales';
 
 /** Log search form */
@@ -17,12 +16,6 @@ export function useLogGridFormSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'createUserCode',
       label: $t('system.log.userCode'),
-    },
-    {
-      component: 'RangePicker',
-      defaultValue: defaultQueryRange(),
-      fieldName: 'createTime',
-      label: $t('system.log.createTime'),
     },
   ];
 }

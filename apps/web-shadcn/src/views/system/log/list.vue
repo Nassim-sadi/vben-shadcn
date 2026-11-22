@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import type { Dayjs } from 'dayjs';
+import type { Recordable } from '@vben/types';
 
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { SystemLogApi } from '#/api';
 
-import { createDateRangeCodec } from '#/utils/date-range-codec';
 import { Page } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -13,23 +12,10 @@ import { $t } from '#/locales';
 
 import { useLogColumns, useLogGridFormSchema } from './data';
 
-interface LogSearchFormValues extends Record<string, unknown> {
-  createTime?: [Dayjs, Dayjs];
-}
-
-const logSearchCodec = createDateRangeCodec<LogSearchFormValues>()({
-  endField: 'endTime',
-  rangeField: 'createTime',
-  startField: 'startTime',
-});
-
-type LogSearchSubmitValues = ReturnType<typeof logSearchCodec.encode>;
-
 const [Grid] = useVbenVxeGrid({
   formOptions: {
     collapsed: true,
     showCollapseButton: true,
-    codec: logSearchCodec,
     schema: useLogGridFormSchema(),
     submitOnChange: true,
   },
@@ -39,7 +25,7 @@ const [Grid] = useVbenVxeGrid({
     keepSource: true,
     proxyConfig: {
       ajax: {
-        query: async ({ page }, formValues: LogSearchSubmitValues) => {
+        query: async ({ page }, formValues: Recordable<any>) => {
           return await getLogList({
             page: page.currentPage,
             pageSize: page.pageSize,

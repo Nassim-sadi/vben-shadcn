@@ -5,7 +5,6 @@ import type { SystemRoleApi } from '#/api';
 import { useAccess } from '@vben/access';
 
 import { $t } from '#/locales';
-import { defaultQueryRange } from '#/utils/date-range-codec';
 
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -49,12 +48,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'keyword',
       label: $t('system.role.nameCode'),
-    },
-    {
-      component: 'RangePicker',
-      defaultValue: defaultQueryRange(),
-      fieldName: 'createTime',
-      label: $t('system.role.createTime'),
     },
     {
       component: 'Select',

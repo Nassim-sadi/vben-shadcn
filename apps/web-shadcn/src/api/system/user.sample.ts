@@ -134,7 +134,7 @@ export function querySampleUsers(params: SampleUserQueryParams = {}) {
   }
 
   filtered = filtered.filter((item) =>
-    inTimeRange(item.createTime, params.startTime, params.endTime),
+    inTimeRange(item.createTime ?? '', params.startTime, params.endTime),
   );
 
   return paginate(filtered, params.page, params.pageSize);

@@ -11,7 +11,6 @@ import { useDictStore } from '@vben/stores';
 import { getDeptList } from '#/api';
 import { Tag } from '#/components/ui/app';
 import { $t } from '#/locales';
-import { defaultQueryRange } from '#/utils/date-range-codec';
 
 const USER_GENDER_CODE = 'user_gender';
 
@@ -43,6 +42,22 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'deptId',
       label: $t('system.user.dept'),
       rules: 'required',
+    },
+    {
+      component: 'Input',
+      componentProps: {
+        maxLength: 100,
+      },
+      fieldName: 'mobile',
+      label: $t('system.user.mobile'),
+    },
+    {
+      component: 'Input',
+      componentProps: {
+        maxLength: 20,
+      },
+      fieldName: 'photoPath',
+      label: $t('system.user.photoPath'),
     },
     {
       component: 'RadioGroup',
@@ -85,12 +100,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: $t('system.user.nameCode'),
     },
     {
-      component: 'RangePicker',
-      defaultValue: defaultQueryRange(),
-      fieldName: 'createTime',
-      label: $t('system.user.createTime'),
-    },
-    {
       component: 'ApiSelect',
       componentProps: {
         allowClear: true,
@@ -110,7 +119,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
         ],
       },
       fieldName: 'status',
-      label: $t('system.user.status'),
+      label: $t('system.user.state'),
     },
     {
       component: 'Input',
@@ -132,12 +141,15 @@ export function useDescriptionItems(row?: SystemUserApi.SystemUser): Description
     { label: $t('system.user.userCode'), content: row?.userCode },
     { label: $t('system.user.id'), content: row?.id },
     { label: $t('system.user.dept'), content: row?.deptId },
+    { label: $t('system.role.roleName'), content: row?.roleName || row?.roleCode },
+    { label: $t('system.user.mobile'), content: row?.mobile },
+    { label: $t('system.user.photoPath'), content: row?.photoPath },
     {
       label: $t('system.user.gender'),
-      content: dictStore.getDictLabel(USER_GENDER_CODE, row?.gender),
+      content: dictStore.getDictLabel(USER_GENDER_CODE, row?.gender) ?? '',
     },
     {
-      label: $t('system.user.status'),
+      label: $t('system.user.state'),
       content: () =>
         h(
           Tag,
@@ -149,7 +161,10 @@ export function useDescriptionItems(row?: SystemUserApi.SystemUser): Description
           },
         ),
     },
+    { label: $t('system.user.createUser'), content: row?.createUserName },
     { label: $t('system.user.createTime'), content: row?.createTime },
+    { label: $t('system.user.updateUser'), content: row?.updateUserName },
+    { label: $t('system.user.updateTime'), content: row?.updateDate },
     { label: $t('system.user.remark'), content: row?.remark },
   ];
 }
@@ -164,20 +179,35 @@ export function useColumns(
     {
       field: 'userCode',
       title: $t('system.user.userCode'),
-      width: 200,
+      width: 180,
       sortable: true,
     },
     {
       field: 'name',
       title: $t('system.user.name'),
-      width: 200,
+      width: 180,
       sortable: true,
+    },
+    {
+      field: 'roleName',
+      title: $t('system.role.roleName'),
+      width: 160,
     },
     {
       field: 'roleCode',
       title: $t('system.role.roleCode'),
-      width: 200,
+      width: 160,
       sortable: true,
+    },
+    {
+      field: 'deptId',
+      title: $t('system.user.deptCode'),
+      width: 160,
+    },
+    {
+      field: 'mobile',
+      title: $t('system.user.mobile'),
+      width: 140,
     },
     {
       cellRender: {
@@ -195,9 +225,14 @@ export function useColumns(
         name: onStatusChange ? 'CellSwitch' : 'CellTag',
       },
       field: 'status',
-      title: $t('system.user.status'),
+      title: $t('system.user.state'),
       width: 100,
       sortable: true,
+    },
+    {
+      field: 'photoPath',
+      title: $t('system.user.photoPath'),
+      width: 160,
     },
     {
       field: 'remark',
@@ -206,10 +241,25 @@ export function useColumns(
       sortable: true,
     },
     {
+      field: 'createUserName',
+      title: $t('system.user.createUser'),
+      width: 140,
+    },
+    {
       field: 'createTime',
       title: $t('system.user.createTime'),
-      width: 200,
+      width: 180,
       sortable: true,
+    },
+    {
+      field: 'updateUserName',
+      title: $t('system.user.updateUser'),
+      width: 140,
+    },
+    {
+      field: 'updateDate',
+      title: $t('system.user.updateTime'),
+      width: 180,
     },
     {
       align: 'center',
