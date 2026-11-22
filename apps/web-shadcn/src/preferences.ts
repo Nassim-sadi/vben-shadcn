@@ -20,6 +20,7 @@ export const overridesPreferences = defineOverridesPreferences({
     mode: 'light',
     semiDarkHeader: true,
     semiDarkSidebar: true,
+    semiDarkSidebarSub: false,
   },
   copyright: appCopyrightPreferences,
 });
