@@ -287,7 +287,7 @@ function clearPreferencesAndLogout() {
     <slot :name="slot.name">
       <template v-if="slot.name === 'refresh'">
         <VbenIconButton class="my-0 mr-1 rounded-md" @click="refresh">
-          <RotateCw class="size-4" />
+          <RotateCw class="text-foreground size-4" />
         </VbenIconButton>
       </template>
     </slot>
@@ -360,7 +360,7 @@ function clearPreferencesAndLogout() {
             :tooltip="$t('ui.widgets.lockScreen.title')"
             @click="handleOpenLock"
           >
-            <LockKeyhole class="size-4" />
+            <LockKeyhole class="text-foreground size-4" />
           </VbenIconButton>
         </template>
         <template v-else-if="slot.name === 'logout-btn'">
@@ -369,7 +369,7 @@ function clearPreferencesAndLogout() {
             :tooltip="$t('common.logout')"
             @click="handleLogout"
           >
-            <LogOut class="size-4" />
+            <LogOut class="text-foreground size-4" />
           </VbenIconButton>
         </template>
         <template v-else-if="slot.name === 'notification'">
@@ -386,7 +386,7 @@ function clearPreferencesAndLogout() {
             :tooltip="$t('preferences.widget.refresh')"
             @click="refresh"
           >
-            <RotateCw class="size-4" />
+            <RotateCw class="text-foreground size-4" />
           </VbenIconButton>
         </template>
       </slot>

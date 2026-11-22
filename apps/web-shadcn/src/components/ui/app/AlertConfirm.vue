@@ -49,9 +49,13 @@ const buttonClasses = computed(
         <AlertDialogDescription>{{ description }}</AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>{{ cancelText }}</AlertDialogCancel>
-        <AlertDialogAction @click="emit('confirm')">
-          {{ okText }}
+        <AlertDialogCancel as-child>
+          <Button variant="outline">{{ cancelText }}</Button>
+        </AlertDialogCancel>
+        <AlertDialogAction as-child>
+          <Button variant="default" @click="emit('confirm')">
+            {{ okText }}
+          </Button>
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

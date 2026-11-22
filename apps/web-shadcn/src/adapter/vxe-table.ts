@@ -30,6 +30,7 @@ import {
 import { objectOmit } from '@vueuse/core';
 
 import { AlertConfirm, Tag } from '#/components/ui/app';
+import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
 
 setupVbenVxeTable({
@@ -47,6 +48,9 @@ setupVbenVxeTable({
           enabled: false,
         },
         minHeight: 180,
+        pagerConfig: {
+          pageSize: TABLE.DEFAULT_PAGE_SIZE,
+        },
         proxyConfig: {
           autoLoad: true,
           response: {
@@ -278,7 +282,9 @@ setupVbenVxeTable({
         }
 
         const renderOperation = (opt: Recordable<any>) =>
-          opt.code === 'delete' ? renderConfirm(opt) : renderBtn(opt);
+          opt.code === 'delete' && opt.popConfirm !== false
+            ? renderConfirm(opt)
+            : renderBtn(opt);
         const btns = operations.map((operation) => renderOperation(operation));
 
         function renderMenuTrigger() {

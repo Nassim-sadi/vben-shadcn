@@ -177,6 +177,7 @@ export function useTypeColumns(
           },
           {
             code: 'delete',
+            popConfirm: false,
             show: () => hasAccessByCodes(['SystemDict:delete']),
           },
         ],

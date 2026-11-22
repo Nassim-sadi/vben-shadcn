@@ -1,21 +1,25 @@
-import {
-  appCopyrightPreferences,
-  defineOverridesPreferences,
-} from '@vben/preferences';
+import { appCopyrightPreferences, defineOverridesPreferences } from '@vben/preferences';
 
 /**
- * @description 项目配置
- * 这里的配置会覆盖默认配置，修改后无需重启，刷新页面即可生效
- * !!! 请不要修改下面的注释，否则会导致配置失效
+ * @description Project configuration
+ * The configuration here will overwrite the default configuration. There is no need to restart after modification. Refresh the page to take effect.
+ * !!! Please do not modify the following comments, otherwise the configuration will become invalid.
  */
 export const overridesPreferences = defineOverridesPreferences({
-  // overrides
+  // Overrides
   app: {
-    // 默认语言为英语；用户仍可在偏好设置中切换为中文
+    // The default language is English; users can still switch to Chinese in preferences
     locale: 'en-US',
     name: import.meta.env.VITE_APP_TITLE,
-    // 路由由后端 /menu/all 下发（按角色权限过滤），按钮由 /auth/codes 控制
+    // Routes are delivered by the backend /menu/all (filtered by role permissions), and buttons are controlled by /auth/codes
     accessMode: 'backend',
+    // Header Two Column
+    layout: 'header-mixed-nav',
+  },
+  theme: {
+    mode: 'light',
+    semiDarkHeader: true,
+    semiDarkSidebar: true,
   },
   copyright: appCopyrightPreferences,
 });

@@ -11,17 +11,9 @@ import type {
 import { markRaw, reactive, readonly, watch } from 'vue';
 
 import { MemoryStorageDriver, StorageManager } from '@vben-core/shared/cache';
-import {
-  isMacOs,
-  merge,
-  mergeWithArrayOverride,
-} from '@vben-core/shared/utils';
+import { isMacOs, merge, mergeWithArrayOverride } from '@vben-core/shared/utils';
 
-import {
-  breakpointsTailwind,
-  useBreakpoints,
-  useDebounceFn,
-} from '@vueuse/core';
+import { breakpointsTailwind, useBreakpoints, useDebounceFn } from '@vueuse/core';
 
 import { defaultPreferences } from './config';
 import { updateCSSVariables } from './update-css-variables';
@@ -45,61 +37,51 @@ class PreferenceManager {
 
   constructor() {
     this.cache = new StorageManager({ driver: new MemoryStorageDriver() });
-    // 构造函数不再同步读取缓存，使用默认值初始化
-    // 真正的缓存加载在 initPreferences 中完成（已经是 async）
+    // The constructor no longer reads the cache synchronously and initializes it with default values
+    // The real cache loading is done in initPreferences (already async)
     this.state = reactive<Preferences>({ ...defaultPreferences });
     this.debouncedSave = useDebounceFn(() => this.saveToCache(), 150);
   }
 
   /**
-   * 清除所有缓存的偏好设置
+   * Clear all cached preferences
    */
   clearCache = async () => {
-    await Promise.all(
-      Object.values(STORAGE_KEYS).map((key) => this.cache.removeItem(key)),
-    );
+    await Promise.all(Object.values(STORAGE_KEYS).map((key) => this.cache.removeItem(key)));
   };
 
   /**
-   * 获取扩展偏好设置
+   * Get extended preferences
    */
-  getCustomPreferences = <
-    TCustomPreferences extends object = CustomPreferencesRecord,
-  >() => {
+  getCustomPreferences = <TCustomPreferences extends object = CustomPreferencesRecord>() => {
     return readonly(this.customState) as Readonly<TCustomPreferences>;
   };
 
   /**
-   * 获取初始化扩展偏好设置
+   * Get initialization extension preferences
    */
-  getInitialCustomPreferences = <
-    TCustomPreferences extends object = CustomPreferencesRecord,
-  >() => {
-    return this.cloneValue(
-      this.initialCustomPreferences,
-    ) as Readonly<TCustomPreferences>;
+  getInitialCustomPreferences = <TCustomPreferences extends object = CustomPreferencesRecord>() => {
+    return this.cloneValue(this.initialCustomPreferences) as Readonly<TCustomPreferences>;
   };
 
   /**
-   * 获取初始化偏好设置
+   * Get initialization preferences
    */
   getInitialPreferences = () => {
     return this.initialPreferences;
   };
 
   /**
-   * 获取当前偏好设置（只读）
+   * Get current preferences (read-only)
    */
   getPreferences = () => {
     return readonly(this.state);
   };
 
   /**
-   * 获取扩展偏好设置配置
+   * Get extended preference configuration
    */
-  getPreferencesExtension = <
-    TCustomPreferences extends object = CustomPreferencesRecord,
-  >() => {
+  getPreferencesExtension = <TCustomPreferences extends object = CustomPreferencesRecord>() => {
     return this.customPreferencesExtension
       ? (this.cloneValue(this.customPreferencesExtension) as Readonly<
           PreferencesExtension<TCustomPreferences>
@@ -108,46 +90,44 @@ class PreferenceManager {
   };
 
   /**
-   * 初始化偏好设置
-   * @param options - 初始化配置项
-   * @param options.namespace - 命名空间，用于隔离不同应用的配置
-   * @param options.overrides - 要覆盖的偏好设置
+   * Initialize preferences
+   * @param options -Initialize configuration items
+   * @param options.namespace -Namespace, used to isolate the configuration of different applications
+   * @param options.overrides -Preferences to override
    */
-  initPreferences = async <
-    TCustomPreferences extends object = CustomPreferencesRecord,
-  >({
+  initPreferences = async <TCustomPreferences extends object = CustomPreferencesRecord>({
     namespace,
     overrides,
     extension,
   }: InitialOptions<TCustomPreferences>) => {
-    // 防止重复初始化
+    // Prevent repeated initialization
     if (this.isInitialized) {
       return;
     }
 
-    // 使用命名空间初始化存储管理器
+    // Initialize storage manager using namespace
     this.cache = new StorageManager({ prefix: namespace });
 
-    // 合并初始偏好设置：前面的对象优先，后面的对象仅补齐缺失字段
+    // Merge initial preferences: earlier objects take precedence, later objects only fill in missing fields
     this.initialPreferences = merge({}, overrides, defaultPreferences);
     this.customPreferencesExtension = extension ?? null;
     this.initialCustomPreferences = this.resolveCustomPreferencesDefaults(
       this.customPreferencesExtension,
     );
 
-    // 加载缓存的偏好设置，并仅用缓存补齐初始化配置中未显式设置的字段
+    // Loads the cached preferences and only uses the cache to complete fields not explicitly set in the initialization configuration
     const cachedPreferences = (await this.loadFromCache()) || {};
-    // 修复历史脏数据：早期版本用 defu(merge) 合并数组，导致 widget.order
-    // 在每次 updatePreferences 时被 concat 追加，膨胀到几十/上百条重复 key。
-    // 这里在加载缓存后做一次去重，保留首次出现的 key。
+    // Fix historical dirty data: earlier versions used defu(merge) to merge arrays, resulting in widget.order
+    // It is appended by concat every time updatePreferences is updated, and expands to dozens/hundreds of duplicate keys.
+    // Here, deduplication is done after loading the cache, and the key that appears for the first time is retained.
     this.sanitizeCachedArray(cachedPreferences, 'widget', 'order');
     const mergedPreference = mergeWithArrayOverride(
       {},
-      cachedPreferences, // 用户缓存的设置优先
-      this.initialPreferences, // 初始设置仅补齐缺失字段
+      cachedPreferences, // User cache settings take precedence
+      this.initialPreferences, // The initial setup only fills in missing fields
     );
 
-    // 更新偏好设置
+    // Update preferences
     this.updatePreferences(mergedPreference);
 
     const cachedCustom = (await this.loadCustomFromCache()) || {};
@@ -160,37 +140,35 @@ class PreferenceManager {
     );
     await this.saveToCache();
 
-    // 设置监听器
+    // Set up listener
     this.setupWatcher();
 
-    // 初始化平台标识
+    // Initialize platform identification
     this.initPlatform();
 
     this.isInitialized = true;
   };
 
   /**
-   * 重置偏好设置到初始状态
+   * Reset preferences to initial state
    */
   resetPreferences = async () => {
-    // 将状态重置为初始偏好设置
+    // Reset state to initial preferences
     Object.assign(this.state, this.initialPreferences);
     this.replaceCustomPreferences(this.initialCustomPreferences);
 
-    // 直接触发 UI 更新
+    // Directly trigger UI updates
     this.handleUpdates(this.state);
 
-    // 保存偏好设置至缓存
+    // Save preferences to cache
     await this.saveToCache();
   };
 
   /**
-   * 更新扩展偏好设置
-   * @param updates - 要更新的扩展偏好设置
+   * Update extension preferences
+   * @param updates -Extension preferences to update
    */
-  updateCustomPreferences = <
-    TCustomPreferences extends object = CustomPreferencesRecord,
-  >(
+  updateCustomPreferences = <TCustomPreferences extends object = CustomPreferencesRecord>(
     updates: DeepPartial<TCustomPreferences>,
   ) => {
     if (!this.customPreferencesExtension) {
@@ -210,25 +188,21 @@ class PreferenceManager {
   };
 
   /**
-   * 更新偏好设置
-   * @param updates - 要更新的偏好设置
+   * Update preferences
+   * @param updates -Preferences to update
    */
   updatePreferences = (updates: DeepPartial<Preferences>) => {
-    // 深度合并更新内容和当前状态
-    // 注意：必须用 mergeWithArrayOverride 而不是 merge。
-    // defu(merge) 对数组的语义是 concat 追加，会导致 widget.order 等
-    // 数组字段在每次 updatePreferences 时被重复追加，指数级膨胀。
-    const mergedState = mergeWithArrayOverride(
-      {},
-      updates,
-      markRaw(this.state),
-    );
+    // Deeply merge updated content and current status
+    // Note: mergeWithArrayOverride must be used instead of merge.
+    // The semantics of defu(merge) for the array is concat append, which will cause widget.order, etc.
+    // Array fields are appended repeatedly every time updatePreferences is called, expanding exponentially.
+    const mergedState = mergeWithArrayOverride({}, updates, markRaw(this.state));
     Object.assign(this.state, mergedState);
 
-    // 根据更新的值执行更新
+    // Perform an update based on the updated value
     this.handleUpdates(updates);
 
-    // 保存到缓存（fire-and-forget，通过 debounce 控制频率）
+    // Save to cache (fire-and-forget, control frequency via debounce)
     this.debouncedSave();
   };
 
@@ -239,9 +213,10 @@ class PreferenceManager {
 
     if (value && typeof value === 'object') {
       return Object.fromEntries(
-        Object.entries(value as Record<string, unknown>).map(
-          ([key, nestedValue]) => [key, this.cloneValue(nestedValue)],
-        ),
+        Object.entries(value as Record<string, unknown>).map(([key, nestedValue]) => [
+          key,
+          this.cloneValue(nestedValue),
+        ]),
       ) as T;
     }
 
@@ -249,29 +224,23 @@ class PreferenceManager {
   }
 
   /**
-   * 处理更新
-   * @param updates - 更新的偏好设置
+   * Handle updates
+   * @param updates -Updated preferences
    */
   private handleUpdates(updates: DeepPartial<Preferences>) {
     const { theme, app } = updates;
 
-    if (
-      theme &&
-      (Object.keys(theme).length > 0 || Reflect.has(theme, 'fontSize'))
-    ) {
+    if (theme && (Object.keys(theme).length > 0 || Reflect.has(theme, 'fontSize'))) {
       updateCSSVariables(this.state);
     }
 
-    if (
-      app &&
-      (Reflect.has(app, 'colorGrayMode') || Reflect.has(app, 'colorWeakMode'))
-    ) {
+    if (app && (Reflect.has(app, 'colorGrayMode') || Reflect.has(app, 'colorWeakMode'))) {
       this.updateColorMode(this.state);
     }
   }
 
   /**
-   * 初始化平台标识
+   * Initialize platform identification
    */
   private initPlatform() {
     document.documentElement.dataset.platform = isMacOs() ? 'macOs' : 'window';
@@ -281,10 +250,7 @@ class PreferenceManager {
     return Math.abs(value - Math.round(value)) < epsilon;
   }
 
-  private isValidCustomPreferenceValue(
-    field: CustomPreferencesField,
-    value: unknown,
-  ) {
+  private isValidCustomPreferenceValue(field: CustomPreferencesField, value: unknown) {
     switch (field.component) {
       case 'number': {
         if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -319,10 +285,7 @@ class PreferenceManager {
         return true;
       }
       case 'select': {
-        return (
-          typeof value === 'string' &&
-          field.options.some((option) => option.value === value)
-        );
+        return typeof value === 'string' && field.options.some((option) => option.value === value);
       }
       case 'switch': {
         return typeof value === 'boolean';
@@ -334,16 +297,16 @@ class PreferenceManager {
   }
 
   /**
-   * 从缓存加载扩展偏好设置
-   * @returns 缓存的扩展偏好设置，如果不存在则返回 null
+   * Load extension preferences from cache
+   * @returns The cached extension preference, or null if it does not exist
    */
   private async loadCustomFromCache(): Promise<CustomPreferencesRecord | null> {
     return this.cache.getItem<CustomPreferencesRecord>(STORAGE_KEYS.CUSTOM);
   }
 
   /**
-   * 从缓存加载偏好设置
-   * @returns 缓存的偏好设置，如果不存在则返回 null
+   * Load preferences from cache
+   * @returns The cached preference, or null if it does not exist
    */
   private async loadFromCache(): Promise<null | Preferences> {
     return this.cache.getItem<Preferences>(STORAGE_KEYS.MAIN);
@@ -356,9 +319,7 @@ class PreferenceManager {
     Object.assign(this.customState, preferences);
   }
 
-  private resolveCustomPreferencesDefaults(
-    extension: null | PreferencesExtension<any>,
-  ) {
+  private resolveCustomPreferencesDefaults(extension: null | PreferencesExtension<any>) {
     if (!extension) {
       return {};
     }
@@ -373,20 +334,14 @@ class PreferenceManager {
   }
 
   private resolveNumericConstraint(value: unknown) {
-    return typeof value === 'number' && Number.isFinite(value)
-      ? value
-      : undefined;
+    return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
   }
 
   /**
-   * 清理缓存中膨胀的数组字段（保留首次出现的元素）
-   * 用于修复早期版本 defu 合并数组时 concat 追加导致的脏数据
+   * Clean bloated array fields in cache (keep first occurrence of element)
+   * Used to fix dirty data caused by concat append when merging arrays in earlier versions of defu
    */
-  private sanitizeCachedArray(
-    cached: Record<string, any>,
-    group: string,
-    field: string,
-  ) {
+  private sanitizeCachedArray(cached: Record<string, any>, group: string, field: string) {
     const node = cached?.[group]?.[field];
     if (!Array.isArray(node) || node.length <= 1) return;
     const seen = new Set<unknown>();
@@ -400,9 +355,7 @@ class PreferenceManager {
     }
   }
 
-  private sanitizeCustomPreferences(
-    updates: DeepPartial<CustomPreferencesRecord>,
-  ) {
+  private sanitizeCustomPreferences(updates: DeepPartial<CustomPreferencesRecord>) {
     if (!this.customPreferencesExtension) {
       return {};
     }
@@ -412,10 +365,7 @@ class PreferenceManager {
     for (const field of this.customPreferencesExtension.fields) {
       const value = updates[field.key];
 
-      if (
-        value !== undefined &&
-        this.isValidCustomPreferenceValue(field, value)
-      ) {
+      if (value !== undefined && this.isValidCustomPreferenceValue(field, value)) {
         result[field.key] = value;
       }
     }
@@ -424,7 +374,7 @@ class PreferenceManager {
   }
 
   /**
-   * 保存偏好设置到缓存
+   * Save preferences to cache
    */
   private async saveToCache() {
     try {
@@ -446,14 +396,14 @@ class PreferenceManager {
   }
 
   /**
-   * 监听状态和系统偏好设置的变化
+   * Listen for changes in state and system preferences
    */
   private setupWatcher() {
     if (this.isInitialized) {
       return;
     }
 
-    // 监听断点，判断是否移动端
+    // Monitor breakpoints to determine whether the mobile terminal is
     const breakpoints = useBreakpoints(breakpointsTailwind);
     const isMobile = breakpoints.smaller('md');
 
@@ -467,17 +417,17 @@ class PreferenceManager {
       { immediate: true },
     );
 
-    // 监听系统主题偏好设置变化
+    // Listen for system theme preference changes
     window
       .matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', ({ matches: isDark }) => {
-        // 仅在自动模式下跟随系统主题
+        // Follow system themes only in automatic mode
         if (this.state.theme.mode === 'auto') {
-          // 先应用实际的主题
+          // Apply the actual theme first
           this.updatePreferences({
             theme: { mode: isDark ? 'dark' : 'light' },
           });
-          // 再恢复为 auto 模式，保持跟随系统的状态
+          // Then return to auto mode and keep following the system.
           this.updatePreferences({
             theme: { mode: 'auto' },
           });
@@ -486,8 +436,8 @@ class PreferenceManager {
   }
 
   /**
-   * 更新页面颜色模式（灰色、色弱）
-   * @param preference - 偏好设置
+   * Update page color mode (grey, color weak)
+   * @param preference -Preferences
    */
   private updateColorMode(preference: Preferences) {
     const { colorGrayMode, colorWeakMode } = preference.app;

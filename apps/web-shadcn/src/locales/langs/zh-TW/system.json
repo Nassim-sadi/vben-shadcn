@@ -1,5 +1,8 @@
 {
   "title": "系統管理",
+  "baseData": {
+    "title": "基礎資料"
+  },
   "user": {
     "title": "使用者管理",
     "list": "使用者列表",
@@ -106,5 +109,30 @@
     "operation": "操作",
     "permissions": "許可權",
     "setPermissions": "授權"
+  },
+  "classes": {
+    "title": "班次管理",
+    "list": "班次列表",
+    "name": "班次",
+    "code": "班次編碼",
+    "beginTime": "開始時間",
+    "endTime": "結束時間",
+    "crossDay": "跨天",
+    "status": "狀態",
+    "remark": "備註",
+    "createTime": "建立時間",
+    "operation": "操作"
+  },
+  "log": {
+    "title": "日誌",
+    "list": "日誌列表",
+    "menuCode": "選單編碼",
+    "userCode": "使用者編碼",
+    "userName": "使用者名稱",
+    "createTime": "時間",
+    "styleCode": "樣式編碼",
+    "ip": "IP 位址",
+    "data": "資料",
+    "remark": "備註"
   }
 }

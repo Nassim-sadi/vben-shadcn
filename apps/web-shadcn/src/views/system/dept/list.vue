@@ -133,7 +133,7 @@ function refreshGrid() {
 <template>
   <Page auto-content-height>
     <FormModal @success="refreshGrid" />
-    <Grid table-title="$t('system.dept.list')">
+    <Grid :table-title="$t('system.dept.list')">
       <template #toolbar-tools>
         <Button v-if="hasAccessByCodes(['SystemDept:create'])" @click="onCreate">
           <Plus class="size-5" />

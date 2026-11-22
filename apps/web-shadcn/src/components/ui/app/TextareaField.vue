@@ -34,7 +34,7 @@ const count = computed(() => String(props.modelValue ?? '').length);
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative w-full">
     <Textarea
       v-bind="$attrs"
       :class="[classes, showCount ? 'pb-6' : '']"

@@ -444,7 +444,7 @@ if (preferences.shortcutKeys.enable) {
             @click="handleOpenLock"
           >
             <VbenIconButton class="mr-2" @click="handleOpenLock">
-              <LockKeyhole class="size-4" />
+              <LockKeyhole class="text-foreground size-4" />
             </VbenIconButton>
             {{ $t('ui.widgets.lockScreen.title') }}
             <DropdownMenuShortcut v-if="enableLockScreenShortcutKey">
@@ -458,7 +458,7 @@ if (preferences.shortcutKeys.enable) {
             @click="handleLogout"
           >
             <VbenIconButton class="mr-2" @click="handleLogout">
-              <LogOut class="size-4" />
+              <LogOut class="text-foreground size-4" />
             </VbenIconButton>
             {{ $t('common.logout') }}
             <DropdownMenuShortcut v-if="enableLogoutShortcutKey">
@@ -554,7 +554,7 @@ if (preferences.shortcutKeys.enable) {
             @click="handleRefresh"
           >
             <VbenIconButton class="mr-2" @click="handleRefresh">
-              <RotateCw class="size-4" />
+              <RotateCw class="text-foreground size-4" />
             </VbenIconButton>
             {{ $t('preferences.widget.refresh') }}
           </DropdownMenuItem>

@@ -1,5 +1,8 @@
 {
   "title": "System Management",
+  "baseData": {
+    "title": "Basic Data"
+  },
   "user": {
     "title": "User Management",
     "list": "User List",
@@ -106,5 +109,30 @@
     "operation": "Operation",
     "permissions": "Permissions",
     "setPermissions": "Permissions"
+  },
+  "classes": {
+    "title": "Shift Management",
+    "list": "Shift List",
+    "name": "Shift",
+    "code": "Shift Code",
+    "beginTime": "Start Time",
+    "endTime": "End Time",
+    "crossDay": "Cross Day",
+    "status": "Status",
+    "remark": "Remark",
+    "createTime": "Created At",
+    "operation": "Operation"
+  },
+  "log": {
+    "title": "Logs",
+    "list": "Log List",
+    "menuCode": "Menu Code",
+    "userCode": "User Code",
+    "userName": "User Name",
+    "createTime": "Time",
+    "styleCode": "Style Code",
+    "ip": "IP Address",
+    "data": "Data",
+    "remark": "Remark"
   }
 }
