@@ -137,6 +137,11 @@ const [TypeGrid, typeGridApi] = useVbenVxeGrid({
         selectType(row.styleCode);
       }
     },
+    // Highlight the selected type once the tree data has actually loaded
+    // (the initial selection happens before the first query resolves).
+    dataChange: () => {
+      syncCurrentTypeRow();
+    },
     rowDragend: onTypeRowDragEnd,
   },
   gridOptions: {
