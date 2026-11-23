@@ -118,6 +118,7 @@ function refreshDataGrid() {
 }
 
 const [TypeGrid, typeGridApi] = useVbenVxeGrid({
+  showSearchForm: false,
   formOptions: {
     collapsed: false,
     commonConfig: {
