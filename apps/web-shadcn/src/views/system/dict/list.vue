@@ -120,7 +120,13 @@ function refreshDataGrid() {
 const [TypeGrid, typeGridApi] = useVbenVxeGrid({
   formOptions: {
     actionLayout: 'newLine',
+    actionWrapperClass: 'pb-1',
     collapsed: true,
+    commonConfig: {
+      formItemClass: 'pb-1',
+      labelClass: 'whitespace-nowrap',
+      labelWidth: 100,
+    },
     schema: useTypeTreeFormSchema(),
     showCollapseButton: true,
     submitOnChange: true,
@@ -200,7 +206,13 @@ const [TypeGrid, typeGridApi] = useVbenVxeGrid({
 const [DataGrid, dataGridApi] = useVbenVxeGrid({
   formOptions: {
     actionLayout: 'newLine',
+    actionWrapperClass: 'pb-1',
     collapsed: true,
+    commonConfig: {
+      formItemClass: 'pb-1',
+      labelClass: 'whitespace-nowrap',
+      labelWidth: 130,
+    },
     schema: useDataSearchFormSchema(),
     showCollapseButton: true,
     submitOnChange: true,
