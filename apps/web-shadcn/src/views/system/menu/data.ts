@@ -71,6 +71,30 @@ export function useColumns(
       title: $t('system.menu.status'),
       width: 100,
     },
+    {
+      field: 'createUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.createUserCode || '',
+      title: $t('system.menu.createUser'),
+      width: 140,
+    },
+    {
+      field: 'createTime',
+      title: $t('system.menu.createTime'),
+      width: 170,
+    },
+    {
+      field: 'updateUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.updateUserCode || '',
+      title: $t('system.menu.updateUser'),
+      width: 140,
+    },
+    {
+      field: 'updateTime',
+      title: $t('system.menu.updateTime'),
+      width: 170,
+    },
 
     {
       align: 'right',

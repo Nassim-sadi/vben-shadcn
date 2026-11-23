@@ -40,6 +40,9 @@ function buildInitialRoles(): SystemRole[] {
       permissions: menuIds.slice(0, permissionCount),
       remark: index % 2 === 0 ? undefined : 'Auto generated role.',
       createTime: formatDateTime(created),
+      createUserName: 'System',
+      updateTime: formatDateTime(created),
+      updateUserName: 'Administrator',
     } satisfies SystemRole;
   });
 }
@@ -99,6 +102,9 @@ export function createSampleRole(data: Omit<SystemRole, 'id'>): SystemRole {
     ...data,
     id: `sample-role-${sequence}`,
     createTime: formatDateTime(new Date()),
+    createUserName: 'System',
+    updateTime: formatDateTime(new Date()),
+    updateUserName: 'Administrator',
   } as unknown as SystemRole;
   roleStore = [created, ...roleStore];
   return structuredClone(created);

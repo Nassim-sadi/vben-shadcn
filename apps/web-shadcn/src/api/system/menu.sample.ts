@@ -1,6 +1,10 @@
 import type { SystemMenuApi } from './menu';
 
-import { findTreeById, flattenTreeIds } from '../sample-helpers';
+import {
+  findTreeById,
+  flattenTreeIds,
+  formatDateTime,
+} from '../sample-helpers';
 
 /**
  * Demo data for the menu tree, used when VITE_SYSTEM_SAMPLE=true.
@@ -48,7 +52,16 @@ function buildInitialTree(): SystemMenu[] {
       path: string;
       type: SystemMenu['type'];
     },
-  ): SystemMenu => ({ authCode: '', pid: '', status: 1, ...data });
+  ): SystemMenu => ({
+    authCode: '',
+    pid: '',
+    status: 1,
+    createTime: formatDateTime(new Date()),
+    createUserName: 'System',
+    updateTime: formatDateTime(new Date()),
+    updateUserName: 'Administrator',
+    ...data,
+  });
 
   return [
     node({

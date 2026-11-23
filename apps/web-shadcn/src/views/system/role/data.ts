@@ -91,9 +91,28 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
       title: $t('system.role.remark'),
     },
     {
+      field: 'createUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.createUserCode || '',
+      title: $t('system.role.createUser'),
+      width: 140,
+    },
+    {
       field: 'createTime',
       title: $t('system.role.createTime'),
-      width: 200,
+      width: 170,
+    },
+    {
+      field: 'updateUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.updateUserCode || '',
+      title: $t('system.role.updateUser'),
+      width: 140,
+    },
+    {
+      field: 'updateTime',
+      title: $t('system.role.updateTime'),
+      width: 170,
     },
     {
       align: 'center',

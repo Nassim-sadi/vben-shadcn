@@ -155,9 +155,28 @@ export function useClassesColumns(
       title: $t('system.classes.remark'),
     },
     {
+      field: 'createUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.createUserCode || '',
+      title: $t('system.classes.createUser'),
+      width: 140,
+    },
+    {
       field: 'createTime',
       title: $t('system.classes.createTime'),
-      width: 180,
+      width: 170,
+    },
+    {
+      field: 'updateUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.updateUserCode || '',
+      title: $t('system.classes.updateUser'),
+      width: 140,
+    },
+    {
+      field: 'updateTime',
+      title: $t('system.classes.updateTime'),
+      width: 170,
     },
     {
       align: 'center',

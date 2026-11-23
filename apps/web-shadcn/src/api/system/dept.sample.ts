@@ -36,10 +36,13 @@ function buildInitialTree(): SystemDept[] {
   ): SystemDept => ({
     children,
     createTime: now,
+    createUserName: 'System',
     id,
     name,
     remark,
     status,
+    updateTime: now,
+    updateUserName: 'Administrator',
     ...sampleDeptFields(id),
   });
 
@@ -88,6 +91,9 @@ export function createSampleDept(
     ...data,
     id,
     createTime: formatDateTime(new Date()),
+    createUserName: 'System',
+    updateTime: formatDateTime(new Date()),
+    updateUserName: 'Administrator',
   } as unknown as SystemDept;
   const parentId = (data as Record<string, any>).pid;
   const parent =
@@ -114,6 +120,66 @@ export function updateSampleDept(
   }
   Object.assign(current, data, { id });
   return structuredClone(current);
+}
+
+export function moveSampleDeptBatch(
+  moves: SystemDeptApi.DeptMove[],
+): SystemDept[] {
+  const isDescendant = (ancestorId: string, candidateId: string): boolean => {
+    let current: string | undefined = candidateId;
+    let guard = 0;
+    while (current && current !== '0' && guard++ < 100) {
+      if (current === ancestorId) {
+        return true;
+      }
+      current = findTreeById(deptTree, current)?.pid;
+    }
+    return false;
+  };
+
+  for (const move of moves) {
+    const node = findTreeById(deptTree, move.deptCode);
+    if (!node) {
+      continue;
+    }
+    const oldPid = node.pid ?? '0';
+    const newPid = move.pid || '0';
+    if (newPid === node.id || isDescendant(node.id, newPid)) {
+      continue;
+    }
+
+    const oldSiblings =
+      oldPid === '0'
+        ? deptTree
+        : (findTreeById(deptTree, oldPid)?.children ?? []);
+    const oldIndex = oldSiblings.findIndex((n) => n.id === node.id);
+    if (oldIndex >= 0) {
+      oldSiblings.splice(oldIndex, 1);
+    }
+
+    let newSiblings: SystemDept[];
+    if (newPid === '0') {
+      newSiblings = deptTree;
+    } else {
+      const parent = findTreeById(deptTree, newPid);
+      if (!parent) {
+        continue;
+      }
+      parent.children = parent.children ?? [];
+      newSiblings = parent.children;
+    }
+    const at = Math.max(0, Math.min(move.targetIndex, newSiblings.length));
+    newSiblings.splice(at, 0, node);
+    node.pid = newPid;
+
+    oldSiblings.forEach((n, i) => {
+      n.displayOrder = i + 1;
+    });
+    newSiblings.forEach((n, i) => {
+      n.displayOrder = i + 1;
+    });
+  }
+  return structuredClone(deptTree);
 }
 
 export function deleteSampleDept(id: string): boolean {

@@ -4,6 +4,7 @@ import {
   createSampleDept,
   deleteSampleDept,
   getSampleDeptList,
+  moveSampleDeptBatch,
   updateSampleDept,
 } from './dept.sample';
 
@@ -18,6 +19,13 @@ export namespace SystemDeptApi {
     pid?: string;
     remark?: string;
     status: 0 | 1;
+  }
+
+  /** One staged drag-and-drop move, applied in order by the batch endpoint. */
+  export interface DeptMove {
+    deptCode: string;
+    pid: string;
+    targetIndex: number;
   }
 }
 
@@ -82,4 +90,15 @@ async function deleteDept(id: string) {
   return requestClient.delete(`/system/dept/${id}`);
 }
 
-export { createDept, deleteDept, getDeptList, updateDept };
+/** Apply staged drag-and-drop moves in one batch */
+async function moveDeptBatch(moves: SystemDeptApi.DeptMove[]) {
+  if (USE_SAMPLE_DATA) {
+    return moveSampleDeptBatch(moves);
+  }
+  return requestClient.put<SystemDeptApi.SystemDept[]>(
+    '/system/dept/move',
+    moves,
+  );
+}
+
+export { createDept, deleteDept, getDeptList, moveDeptBatch, updateDept };

@@ -92,6 +92,7 @@ export function useColumns(
   return [
     {
       align: 'left',
+      dragSort: true,
       field: 'name',
       fixed: 'left',
       title: $t('system.dept.deptName'),
@@ -116,9 +117,28 @@ export function useColumns(
       width: 100,
     },
     {
+      field: 'createUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.createUserCode || '',
+      title: $t('system.dept.createUser'),
+      width: 140,
+    },
+    {
       field: 'createTime',
       title: $t('system.dept.createTime'),
-      width: 180,
+      width: 170,
+    },
+    {
+      field: 'updateUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.updateUserCode || '',
+      title: $t('system.dept.updateUser'),
+      width: 140,
+    },
+    {
+      field: 'updateTime',
+      title: $t('system.dept.updateTime'),
+      width: 170,
     },
     {
       field: 'remark',
