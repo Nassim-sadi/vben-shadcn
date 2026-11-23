@@ -113,6 +113,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: false,
     showCollapseButton: false,
+    // Keep the three filters + actions compact instead of spreading them
+    // across the full grid width (the shared default is 3 x ~400px columns).
+    commonConfig: { labelWidth: 100 },
+    wrapperClass:
+      'grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,240px))]',
     schema: useGridFormSchema(),
     submitOnChange: true,
   },
@@ -127,16 +132,19 @@ const [Grid, gridApi] = useVbenVxeGrid({
       remote: true,
     },
     proxyConfig: {
+      // Required for vxe-grid to wire sort-change -> remote proxy query.
+      sort: true,
       ajax: {
         query: async ({ page, sort }, formValues: Recordable<any>) => {
-          const sortArr = (sort as unknown) as Array<{ field?: string; order?: string }> | undefined;
+          // vxe-grid passes the active sort as a single object, not an array.
+          const sortInfo = sort as { field?: string; order?: string } | undefined;
           return await getUserList({
             page: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
             deptId: selectedDeptId.value || undefined,
-            sortBy: sortArr?.[0]?.field,
-            sortOrder: sortArr?.[0]?.order,
+            sortBy: sortInfo?.field,
+            sortOrder: sortInfo?.order,
           });
         },
       },
@@ -324,13 +332,13 @@ async function handleExport() {
     worksheet.columns = [
       { header: $t('system.user.id'), key: 'id', width: 30 },
       { header: $t('system.user.name'), key: 'name', width: 30 },
+      { header: $t('system.user.deptName'), key: 'deptName', width: 30 },
       { header: $t('system.user.userCode'), key: 'userCode', width: 30 },
       { header: $t('system.role.roleName'), key: 'roleName', width: 24 },
       { header: $t('system.role.roleCode'), key: 'roleCode', width: 24 },
-      { header: $t('system.user.deptCode'), key: 'deptCode', width: 30 },
       { header: $t('system.user.mobile'), key: 'mobile', width: 24 },
       { header: $t('system.user.photoPath'), key: 'photoPath', width: 30 },
-      { header: $t('system.user.gender'), key: 'gender', width: 15 },
+      { header: $t('system.user.genderName'), key: 'genderName', width: 15 },
       { header: $t('system.user.state'), key: 'state', width: 15 },
       { header: $t('system.user.remark'), key: 'remark', width: 40 },
       { header: $t('system.user.createUser'), key: 'createUserName', width: 24 },
@@ -343,13 +351,13 @@ async function handleExport() {
       worksheet.addRow({
         id: user.id,
         name: user.name,
+        deptName: user.deptName ?? '',
         userCode: user.userCode ?? '',
         roleName: user.roleName ?? '',
         roleCode: user.roleCode ?? '',
-        deptCode: user.deptCode ?? '',
         mobile: user.mobile ?? '',
         photoPath: user.photoPath ?? '',
-        gender: user.gender ?? 0,
+        genderName: user.genderName ?? '',
         state: user.status === 1 ? $t('common.enabled') : $t('common.disabled'),
         remark: user.remark ?? '',
         createUserName: user.createUserName ?? '',
@@ -428,31 +436,17 @@ async function handleExport() {
     <div class="flex size-full">
       <Card class="dept-card w-1/6">
         <div class="shrink-0">
-          <InputSearch
-            v-model="inputSearchValue"
-            :placeholder="$t('system.user.placeholder')"
-          />
+          <InputSearch v-model="inputSearchValue" :placeholder="$t('system.user.placeholder')" />
         </div>
         <div class="min-h-0 flex-1 overflow-auto">
-          <Tree
-            label-field="name"
-            value-field="id"
-            allow-clear
-            :tree-data="deptTreeData"
-            :default-expanded-level="2"
-            @select="selectDept"
-          />
+          <Tree label-field="name" value-field="id" allow-clear :tree-data="deptTreeData" :default-expanded-level="2" @select="selectDept" />
         </div>
       </Card>
 
       <div class="w-5/6 ml-4">
         <Grid :table-title="$t('system.user.list')">
           <template #toolbar-tools>
-            <Button
-              v-if="hasAccessByCodes(['SystemUser:create'])"
-              @click="onCreate"
-              class="mr-2"
-            >
+            <Button v-if="hasAccessByCodes(['SystemUser:create'])" @click="onCreate" class="mr-2">
               <Plus class="size-5" />
               {{ $t('ui.actionTitle.create', [$t('system.user.name')]) }}
             </Button>
@@ -463,55 +457,51 @@ async function handleExport() {
             <SortDropdown :gridApi="gridApi" />
           </template>
           <template #action="{ row }">
-            <VbenTableAction
-              :actions="[
+            <VbenTableAction :actions="[
+              {
+                text: $t('common.detail'),
+                icon: 'lucide:eye',
+                auth: ['SystemUser'],
+                onClick: () => onDetail(row),
+              },
+              {
+                text: $t('common.edit'),
+                icon: 'lucide:edit',
+                auth: ['SystemUser:edit'],
+                onClick: () => onEdit(row),
+              },
+            ]" :dropdown-actions="[
                 {
-                  text: $t('common.detail'),
-                  icon: 'lucide:eye',
-                  auth: ['SystemUser'],
-                  onClick: () => onDetail(row),
-                },
-                {
-                  text: $t('common.edit'),
-                  icon: 'lucide:edit',
+                  text: $t('system.user.lock'),
+                  icon: 'lucide:lock',
                   auth: ['SystemUser:edit'],
-                  onClick: () => onEdit(row),
+                  disabled: row.status === 0,
+                  onClick: () => setUserStatus(row, 0),
                 },
-              ]"
-:dropdown-actions="[
-  {
-    text: $t('system.user.lock'),
-    icon: 'lucide:lock',
-    auth: ['SystemUser:edit'],
-    disabled: row.status === 0,
-    onClick: () => setUserStatus(row, 0),
-  },
-  {
-    text: $t('system.user.unlock'),
-    icon: 'lucide:lock-open',
-    auth: ['SystemUser:edit'],
-    disabled: row.status === 1,
-    onClick: () => setUserStatus(row, 1),
-  },
-  {
-    text: $t('system.user.assignRole'),
-    icon: 'lucide:user-check',
-    auth: ['SystemUser:assignRole'],
-    onClick: () => assignRoleModalApi.setData(row).open(),
-  },
-  {
-    text: $t('common.delete'),
-    icon: 'lucide:trash-2',
-    danger: true,
-    auth: ['SystemUser:delete'],
-    popConfirm: {
-      title: $t('ui.actionMessage.deleteConfirm', [row.name]),
-      confirm: () => onDelete(row),
-    },
-  },
-]"
-              align="center"
-            />
+                {
+                  text: $t('system.user.unlock'),
+                  icon: 'lucide:lock-open',
+                  auth: ['SystemUser:edit'],
+                  disabled: row.status === 1,
+                  onClick: () => setUserStatus(row, 1),
+                },
+                {
+                  text: $t('system.user.assignRole'),
+                  icon: 'lucide:user-check',
+                  auth: ['SystemUser:assignRole'],
+                  onClick: () => assignRoleModalApi.setData(row).open(),
+                },
+                {
+                  text: $t('common.delete'),
+                  icon: 'lucide:trash-2',
+                  danger: true,
+                  auth: ['SystemUser:delete'],
+                  popConfirm: {
+                    title: $t('ui.actionMessage.deleteConfirm', [row.name]),
+                    confirm: () => onDelete(row),
+                  },
+                },
+              ]" align="center" />
           </template>
         </Grid>
       </div>

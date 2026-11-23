@@ -135,13 +135,19 @@ export function useDescriptionItems(row?: SystemUserApi.SystemUser): Description
     { label: $t('system.user.name'), content: row?.name },
     { label: $t('system.user.userCode'), content: row?.userCode },
     { label: $t('system.user.id'), content: row?.id },
-    { label: $t('system.user.dept'), content: row?.deptId },
+    {
+      label: $t('system.user.deptName'),
+      content: row?.deptName || row?.deptId,
+    },
     { label: $t('system.role.roleName'), content: row?.roleName || row?.roleCode },
     { label: $t('system.user.mobile'), content: row?.mobile },
     { label: $t('system.user.photoPath'), content: row?.photoPath },
     {
       label: $t('system.user.gender'),
-      content: dictStore.getDictLabel(USER_GENDER_CODE, row?.gender) ?? '',
+      content:
+        row?.genderName ||
+        dictStore.getDictLabel(USER_GENDER_CODE, row?.gender) ||
+        '',
     },
     {
       label: $t('system.user.state'),
@@ -184,6 +190,11 @@ export function useColumns(
       sortable: true,
     },
     {
+      field: 'deptName',
+      title: $t('system.user.deptName'),
+      width: 180,
+    },
+    {
       field: 'roleName',
       title: $t('system.role.roleName'),
       width: 160,
@@ -193,11 +204,6 @@ export function useColumns(
       title: $t('system.role.roleCode'),
       width: 160,
       sortable: true,
-    },
-    {
-      field: 'deptId',
-      title: $t('system.user.deptCode'),
-      width: 160,
     },
     {
       field: 'mobile',
@@ -255,6 +261,7 @@ export function useColumns(
       field: 'updateDate',
       title: $t('system.user.updateTime'),
       width: 180,
+      sortable: true,
     },
     {
       align: 'center',

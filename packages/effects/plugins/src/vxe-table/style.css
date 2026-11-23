@@ -105,7 +105,7 @@
 }
 
 .vxe-header--column .vxe-cell--title {
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .vxe-table .vxe-body--row.row--current > .vxe-body--column:first-child {

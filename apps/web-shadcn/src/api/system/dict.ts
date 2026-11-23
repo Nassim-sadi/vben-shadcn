@@ -8,159 +8,225 @@ import {
   deleteSampleDictData,
   deleteSampleDictType,
   isSampleDictCodeExists,
+  moveSampleDictData,
+  moveSampleDictType,
   querySampleDictData,
+  querySampleDictTree,
   querySampleDictTypes,
   updateSampleDictData,
   updateSampleDictType,
 } from './dict.sample';
 
 export namespace SystemDictApi {
+  /** T_Base_Style row. Field names mirror the DB columns. */
   export interface SystemDictType {
     [key: string]: any;
-    code: string;
     createTime?: string;
-    id: string;
-    name: string;
+    createUserCode?: string;
+    createUserName?: string;
+    displayOrder: number;
+    id: number;
+    parentStyleCode: string;
     remark?: string;
-    status: 0 | 1;
+    styleCode: string;
+    styleName: string;
+    updateTime?: string;
+    updateUserCode?: string;
+    updateUserName?: string;
+    children?: SystemDictType[];
   }
 
+  /** T_Base_StyleSub row. Field names mirror the DB columns. */
   export interface SystemDictData {
     [key: string]: any;
-    color?: string;
     createTime?: string;
-    dictCode: string;
-    id: string;
-    label: string;
+    createUserCode?: string;
+    createUserName?: string;
+    displayOrder: number;
+    id: number;
     remark?: string;
-    sort: number;
-    status: 0 | 1;
-    value: number | string;
+    styleCode: string;
+    subStyleCode: string;
+    subStyleName: string;
+    subStyleNameExt?: string | null;
+    updateTime?: string;
+    updateUserCode?: string;
+    updateUserName?: string;
+  }
+
+  export interface DictTypeMove {
+    parentStyleCode: string;
+    styleCode: string;
+    targetIndex: number;
+  }
+
+  export interface DictDataMove {
+    subStyleCode: string;
+    targetIndex: number;
+    targetStyleCode?: string;
+  }
+
+  /** Flat node in the combined dictionary tree (types + their data rows). */
+  export interface SystemDictNode {
+    [key: string]: any;
+    createTime?: string;
+    createUserCode?: string;
+    createUserName?: string;
+    displayOrder: number;
+    id: number;
+    nodeKey: string;
+    nodeType: 'type' | 'data';
+    parentKey: string;
+    parentStyleCode?: string;
+    remark?: string;
+    styleCode: string;
+    styleName?: string;
+    subStyleCode?: string;
+    subStyleName?: string;
+    subStyleNameExt?: string | null;
+    updateTime?: string;
+    updateUserCode?: string;
+    updateUserName?: string;
+    children?: SystemDictNode[];
   }
 }
 
 /** Static demo environment (VITE_SYSTEM_SAMPLE=true) uses in-memory dictionaries */
 const USE_SAMPLE_DATA = import.meta.env.VITE_SYSTEM_SAMPLE === 'true';
 
-/**
- * Get dictionary type list
- */
-async function getDictTypeList(params: Recordable<any>) {
-  if (USE_SAMPLE_DATA) {
-    return querySampleDictTypes(params);
-  }
-  return requestClient.get<{
-    items: SystemDictApi.SystemDictType[];
-    total: number;
-  }>('/system/dict/type/list', { params });
-}
+type DictTypeWrite = Omit<
+  SystemDictApi.SystemDictType,
+  'children' | 'createTime' | 'createUserCode' | 'createUserName' | 'id' | 'updateTime' | 'updateUserCode' | 'updateUserName'
+>;
 
-/**
- * Create dictionary type
- * @param data Dictionary type data
- */
-async function createDictType(
-  data: Omit<SystemDictApi.SystemDictType, 'createTime' | 'id'>,
-) {
-  if (USE_SAMPLE_DATA) {
-    return createSampleDictType(data);
-  }
-  return requestClient.post('/system/dict/type', data);
-}
+type DictDataWrite = Omit<
+  SystemDictApi.SystemDictData,
+  'createTime' | 'createUserCode' | 'createUserName' | 'id' | 'updateTime' | 'updateUserCode' | 'updateUserName'
+>;
 
-/**
- * Update dictionary type
- * @param id Dictionary type ID
- * @param data Dictionary type data
- */
-async function updateDictType(
-  id: string,
-  data: Omit<SystemDictApi.SystemDictType, 'id'>,
-) {
+/** Get the combined type + data tree for the admin grid. */
+async function getDictTree(params: Recordable<any> = {}) {
   if (USE_SAMPLE_DATA) {
-    return updateSampleDictType(id, data);
+    return querySampleDictTree(params);
   }
-  return requestClient.put(`/system/dict/type/${id}`, data);
-}
-
-/**
- * Delete dictionary type
- * @param id Dictionary type ID
- */
-async function deleteDictType(id: string) {
-  if (USE_SAMPLE_DATA) {
-    return deleteSampleDictType(id);
-  }
-  return requestClient.delete(`/system/dict/type/${id}`);
-}
-
-/**
- * Check if dictionary code already exists
- * @param code Dictionary code
- * @param id ID of dictionary type being edited (optional)
- */
-async function isDictCodeExists(
-  code: string,
-  id?: SystemDictApi.SystemDictType['id'],
-) {
-  if (USE_SAMPLE_DATA) {
-    return isSampleDictCodeExists(code, id);
-  }
-  return requestClient.get<boolean>('/system/dict/type/code-exists', {
-    params: { code, id },
+  return requestClient.get<SystemDictApi.SystemDictNode[]>('/system/dict/tree', {
+    params,
   });
 }
 
 /**
- * Get dictionary data list
+ * Get dictionary type tree. Returned as a flat list ordered as a tree; the grid
+ * transforms it using parentStyleCode.
  */
+async function getDictTypeTree(params: Recordable<any> = {}) {
+  if (USE_SAMPLE_DATA) {
+    return querySampleDictTypes(params);
+  }
+  return requestClient.get<SystemDictApi.SystemDictType[]>(
+    '/system/dict/type/tree',
+    { params },
+  );
+}
+
+/**
+ * Get dictionary type list (compatibility alias of the tree endpoint).
+ */
+async function getDictTypeList(params: Recordable<any> = {}) {
+  return getDictTypeTree(params);
+}
+
+async function createDictType(data: DictTypeWrite) {
+  if (USE_SAMPLE_DATA) {
+    return createSampleDictType(data);
+  }
+  return requestClient.post<SystemDictApi.SystemDictType>('/system/dict/type', data);
+}
+
+async function updateDictType(styleCode: string, data: Partial<DictTypeWrite>) {
+  if (USE_SAMPLE_DATA) {
+    return updateSampleDictType(styleCode, data);
+  }
+  return requestClient.put<SystemDictApi.SystemDictType>(
+    `/system/dict/type/${encodeURIComponent(styleCode)}`,
+    data,
+  );
+}
+
+async function deleteDictType(styleCode: string) {
+  if (USE_SAMPLE_DATA) {
+    return deleteSampleDictType(styleCode);
+  }
+  return requestClient.delete<boolean>(
+    `/system/dict/type/${encodeURIComponent(styleCode)}`,
+  );
+}
+
+async function moveDictType(data: SystemDictApi.DictTypeMove) {
+  if (USE_SAMPLE_DATA) {
+    return moveSampleDictType(data);
+  }
+  return requestClient.put<SystemDictApi.SystemDictType[]>(
+    '/system/dict/type/move',
+    data,
+  );
+}
+
+async function isDictCodeExists(
+  styleCode: string,
+  id?: SystemDictApi.SystemDictType['styleCode'],
+) {
+  if (USE_SAMPLE_DATA) {
+    return isSampleDictCodeExists(styleCode, id);
+  }
+  return requestClient.get<boolean>('/system/dict/type/code-exists', {
+    params: { code: styleCode, id },
+  });
+}
+
 async function getDictDataList(params: Recordable<any>) {
   if (USE_SAMPLE_DATA) {
     return querySampleDictData(params);
   }
-  return requestClient.get<{
-    items: SystemDictApi.SystemDictData[];
-    total: number;
-  }>('/system/dict/data/list', { params });
+  return requestClient.get<SystemDictApi.SystemDictData[]>(
+    '/system/dict/data/list',
+    { params },
+  );
 }
 
-/**
- * Create dictionary data
- * @param data Dictionary data
- */
-async function createDictData(
-  data: Omit<SystemDictApi.SystemDictData, 'createTime' | 'id'>,
-) {
+async function createDictData(data: DictDataWrite) {
   if (USE_SAMPLE_DATA) {
     return createSampleDictData(data);
   }
-  return requestClient.post('/system/dict/data', data);
+  return requestClient.post<SystemDictApi.SystemDictData>('/system/dict/data', data);
 }
 
-/**
- * Update dictionary data
- * @param id Dictionary data ID
- * @param data Dictionary data
- */
-async function updateDictData(
-  id: string,
-  data: Omit<SystemDictApi.SystemDictData, 'id'>,
-) {
+async function updateDictData(subStyleCode: string, data: Partial<DictDataWrite>) {
   if (USE_SAMPLE_DATA) {
-    return updateSampleDictData(id, data);
+    return updateSampleDictData(subStyleCode, data);
   }
-  return requestClient.put(`/system/dict/data/${id}`, data);
+  return requestClient.put<SystemDictApi.SystemDictData>(
+    `/system/dict/data/${encodeURIComponent(subStyleCode)}`,
+    data,
+  );
 }
 
-/**
- * Delete dictionary data
- * @param id Dictionary data ID
- */
-async function deleteDictData(id: string) {
+async function deleteDictData(subStyleCode: string) {
   if (USE_SAMPLE_DATA) {
-    return deleteSampleDictData(id);
+    return deleteSampleDictData(subStyleCode);
   }
-  return requestClient.delete(`/system/dict/data/${id}`);
+  return requestClient.delete<boolean>(
+    `/system/dict/data/${encodeURIComponent(subStyleCode)}`,
+  );
+}
+
+async function moveDictData(data: SystemDictApi.DictDataMove) {
+  if (USE_SAMPLE_DATA) {
+    return moveSampleDictData(data);
+  }
+  return requestClient.put<SystemDictApi.SystemDictData[]>(
+    '/system/dict/data/move',
+    data,
+  );
 }
 
 export {
@@ -169,8 +235,12 @@ export {
   deleteDictData,
   deleteDictType,
   getDictDataList,
+  getDictTree,
   getDictTypeList,
+  getDictTypeTree,
   isDictCodeExists,
+  moveDictData,
+  moveDictType,
   updateDictData,
   updateDictType,
 };

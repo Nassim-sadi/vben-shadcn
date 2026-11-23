@@ -1,11 +1,13 @@
 <script lang="ts" setup>
+import type { Recordable } from '@vben/types';
+
 import type {
   OnActionClickParams,
   VxeTableGridOptions,
 } from '#/adapter/vxe-table';
 import type { SystemDictApi } from '#/api';
 
-import { nextTick, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 
@@ -22,27 +24,46 @@ import {
   deleteDictData,
   deleteDictType,
   getDictDataList,
-  getDictTypeList,
+  getDictTypeTree,
+  moveDictData,
+  moveDictType,
 } from '#/api';
-import { Tag } from '#/components/ui/app';
 import { $t } from '#/locales';
 
 import {
   useDataColumns,
-  useDataGridFormSchema,
+  useDataSearchFormSchema,
   useTypeColumns,
-  useTypeGridFormSchema,
+  useTypeTreeFormSchema,
 } from './data';
 import DataForm from './modules/data-form.vue';
 import TypeForm from './modules/type-form.vue';
+
+type TypeRow = SystemDictApi.SystemDictType;
+type DataRow = SystemDictApi.SystemDictData;
+
+type TypeDragEnd = {
+  dragRow: TypeRow;
+  dragToChild?: boolean;
+  newRow?: TypeRow;
+  offsetIndex?: 0 | 1;
+};
+
+type DataDragEnd = {
+  dragRow: DataRow;
+  newRow?: DataRow;
+  offsetIndex?: 0 | 1;
+};
 
 const route = useRoute();
 const router = useRouter();
 const dictStore = useDictStore();
 const { hasAccessByCodes } = useAccess();
 
-const selectedCode = ref(String(route.query.code ?? ''));
-let initialized = false;
+const selectedTypeCode = ref(
+  String(route.query.styleCode ?? route.query.code ?? ''),
+);
+let typeTreeInitialized = false;
 
 const [TypeFormModal, typeFormModalApi] = useVbenModal({
   connectedComponent: TypeForm,
@@ -53,79 +74,111 @@ const [DataFormModal, dataFormModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
-/** Highlight the row matching the current selection in the left grid. */
-function syncTypeCurrentRow() {
-  const grid = typeGridApi.grid;
-  if (!grid?.getTableData) {
-    return;
-  }
-  const rows = grid.getTableData().visibleData ?? [];
-  const row = rows.find((item) => item.code === selectedCode.value);
-  if (row) {
-    void grid.setCurrentRow(row);
-  } else {
-    grid.clearCurrentRow?.();
+function selectType(styleCode: string, syncUrl = true) {
+  selectedTypeCode.value = styleCode;
+  if (syncUrl) {
+    void router.replace({ query: styleCode ? { styleCode } : {} });
   }
 }
 
-function selectType(code: string, syncUrl = true) {
-  selectedCode.value = code;
-  if (syncUrl) {
-    void router.replace({ query: code ? { code } : {} });
+function findTypeNode(
+  rows: TypeRow[],
+  styleCode: string,
+): TypeRow | undefined {
+  for (const row of rows) {
+    if (row.styleCode === styleCode) {
+      return row;
+    }
+    const found = findTypeNode(row.children ?? [], styleCode);
+    if (found) {
+      return found;
+    }
   }
-  void nextTick(syncTypeCurrentRow);
+  return undefined;
+}
+
+function syncCurrentTypeRow() {
+  const grid = typeGridApi.grid;
+  if (!grid || !selectedTypeCode.value) {
+    return;
+  }
+  const data = (grid.getTableData()?.fullData ?? []) as TypeRow[];
+  const row = findTypeNode(data, selectedTypeCode.value);
+  if (row) {
+    grid.setCurrentRow(row);
+  }
+}
+
+function refreshTypeGrid() {
+  void typeGridApi.query();
+}
+
+function refreshDataGrid() {
+  void dataGridApi.query();
 }
 
 const [TypeGrid, typeGridApi] = useVbenVxeGrid({
   formOptions: {
+    actionLayout: 'newLine',
     collapsed: true,
+    schema: useTypeTreeFormSchema(),
     showCollapseButton: true,
-    schema: useTypeGridFormSchema(),
     submitOnChange: true,
+    wrapperClass: 'grid-cols-1',
   },
   gridEvents: {
-    cellClick: (params: { row?: SystemDictApi.SystemDictType }) => {
-      if (params.row?.code) {
-        selectType(params.row.code);
+    cellClick: ({ row }: { row?: TypeRow }) => {
+      if (row?.styleCode) {
+        selectType(row.styleCode);
       }
     },
-    dataChange: () => {
-      void nextTick(syncTypeCurrentRow);
-    },
+    rowDragend: onTypeRowDragEnd,
   },
   gridOptions: {
     columns: useTypeColumns(onTypeActionClick),
     height: 'auto',
     keepSource: true,
+    pagerConfig: { enabled: false },
     proxyConfig: {
       ajax: {
-        query: async ({ page }, formValues) => {
-          const result = await getDictTypeList({
-            page: page.currentPage,
-            pageSize: page.pageSize,
-            ...formValues,
+        query: async (_params, formValues: Recordable<string>) => {
+          const rows = await getDictTypeTree({
+            styleCode: formValues?.styleCode,
+            styleName: formValues?.styleName,
           });
-          const items = result.items ?? [];
-          if (!initialized) {
-            initialized = true;
-            const wanted = String(route.query.code ?? '');
-            const match = items.find((item) => item.code === wanted) ?? items[0];
+          if (!typeTreeInitialized) {
+            typeTreeInitialized = true;
+            const wanted = String(
+              route.query.styleCode ?? route.query.code ?? '',
+            );
+            const match =
+              rows.find((row) => row.styleCode === wanted) ?? rows[0];
             if (match) {
-              selectType(match.code, false);
+              selectType(match.styleCode, false);
             }
           } else if (
-            selectedCode.value &&
-            !items.some((item) => item.code === selectedCode.value)
+            selectedTypeCode.value &&
+            !rows.some((row) => row.styleCode === selectedTypeCode.value)
           ) {
             selectType('', false);
           }
-          return result;
+          return rows;
         },
       },
     },
     rowConfig: {
+      drag: true,
       isCurrent: true,
-      keyField: 'id',
+      keyField: 'styleCode',
+    },
+    rowDragConfig: {
+      isAutoExpandToChild: true,
+      isCrossDrag: true,
+      isPeerDrag: true,
+      isToChildDrag: true,
+      showDragTip: true,
+      showIcon: true,
+      trigger: 'row',
     },
     toolbarConfig: {
       custom: true,
@@ -134,37 +187,58 @@ const [TypeGrid, typeGridApi] = useVbenVxeGrid({
       search: true,
       zoom: true,
     },
-  } as VxeTableGridOptions<SystemDictApi.SystemDictType>,
+    treeConfig: {
+      childrenField: 'children',
+      expandAll: true,
+      parentField: 'parentStyleCode',
+      rowField: 'styleCode',
+      transform: true,
+    },
+  } as VxeTableGridOptions<TypeRow>,
 });
 
 const [DataGrid, dataGridApi] = useVbenVxeGrid({
   formOptions: {
+    actionLayout: 'newLine',
     collapsed: true,
+    schema: useDataSearchFormSchema(),
     showCollapseButton: true,
-    schema: useDataGridFormSchema(),
     submitOnChange: true,
+    wrapperClass: 'grid-cols-1 md:grid-cols-2',
+  },
+  gridEvents: {
+    rowDragend: onDataRowDragEnd,
   },
   gridOptions: {
     columns: useDataColumns(onDataActionClick),
     height: 'auto',
     keepSource: true,
+    pagerConfig: { enabled: false },
     proxyConfig: {
       ajax: {
-        query: async ({ page }, formValues) => {
-          if (!selectedCode.value) {
-            return { items: [], total: 0 };
+        query: async (_params, formValues: Recordable<string>) => {
+          if (!selectedTypeCode.value) {
+            return [];
           }
           return await getDictDataList({
-            dictCode: selectedCode.value,
-            page: page.currentPage,
-            pageSize: page.pageSize,
-            ...formValues,
+            styleCode: selectedTypeCode.value,
+            subStyleName: formValues?.subStyleName,
+            subStyleCode: formValues?.subStyleCode,
           });
         },
       },
     },
     rowConfig: {
-      keyField: 'id',
+      drag: true,
+      isCurrent: true,
+      keyField: 'subStyleCode',
+    },
+    rowDragConfig: {
+      isCrossDrag: true,
+      isPeerDrag: true,
+      showDragTip: true,
+      showIcon: true,
+      trigger: 'row',
     },
     toolbarConfig: {
       custom: true,
@@ -173,24 +247,152 @@ const [DataGrid, dataGridApi] = useVbenVxeGrid({
       search: true,
       zoom: true,
     },
-  } as VxeTableGridOptions<SystemDictApi.SystemDictData>,
+  } as VxeTableGridOptions<DataRow>,
 });
 
-watch(selectedCode, () => {
-  dataGridApi.query();
+watch(selectedTypeCode, () => {
+  syncCurrentTypeRow();
+  refreshDataGrid();
 });
+
+async function onTypeRowDragEnd({
+  dragRow,
+  dragToChild,
+  newRow,
+  offsetIndex = 0,
+}: TypeDragEnd) {
+  if (!dragRow?.styleCode) {
+    return;
+  }
+
+  const parentStyleCode =
+    dragToChild && newRow?.styleCode
+      ? newRow.styleCode
+      : newRow?.parentStyleCode || dragRow.parentStyleCode || '0';
+  const allRows = await getDictTypeTree();
+  let targetIndex = -1;
+
+  if (dragToChild && newRow?.styleCode) {
+    const children = allRows.filter(
+      (row) =>
+        (row.parentStyleCode ?? '0') === newRow.styleCode &&
+        row.styleCode !== dragRow.styleCode,
+    );
+    targetIndex = offsetIndex ? children.length : 0;
+  } else if (newRow?.styleCode) {
+    const siblings = allRows
+      .filter(
+        (row) =>
+          (row.parentStyleCode ?? '0') === parentStyleCode &&
+          row.styleCode !== dragRow.styleCode,
+      )
+      .toSorted(
+        (a, b) =>
+          a.displayOrder - b.displayOrder ||
+          a.styleCode.localeCompare(b.styleCode),
+      );
+    const newIndex = siblings.findIndex(
+      (row) => row.styleCode === newRow.styleCode,
+    );
+    if (newIndex >= 0) {
+      targetIndex = newIndex + offsetIndex;
+    }
+  }
+
+  if (targetIndex < 0) {
+    const fullData = (typeGridApi.grid?.getTableData()?.fullData ??
+      []) as TypeRow[];
+    const parentNode =
+      parentStyleCode === '0'
+        ? undefined
+        : findTypeNode(fullData, parentStyleCode);
+    const siblings =
+      parentStyleCode === '0' ? fullData : (parentNode?.children ?? []);
+    targetIndex = siblings.findIndex(
+      (row) => row.styleCode === dragRow.styleCode,
+    );
+  }
+  if (targetIndex < 0) {
+    return;
+  }
+
+  const hideLoading = toast.loading('Updating...');
+  try {
+    await moveDictType({
+      styleCode: dragRow.styleCode,
+      parentStyleCode,
+      targetIndex,
+    });
+    dictStore.refreshDict();
+    toast.success($t('ui.actionMessage.operationSuccess'), { id: hideLoading });
+  } catch (error) {
+    toast.error(
+      (error as Error)?.message ?? $t('ui.actionMessage.operationFailed'),
+      { id: hideLoading },
+    );
+  } finally {
+    refreshTypeGrid();
+  }
+}
+
+async function onDataRowDragEnd({
+  dragRow,
+  newRow,
+  offsetIndex = 0,
+}: DataDragEnd) {
+  if (!dragRow?.subStyleCode || !selectedTypeCode.value) {
+    return;
+  }
+
+  const rows = await getDictDataList({ styleCode: selectedTypeCode.value });
+  const siblings = rows
+    .filter((row) => row.subStyleCode !== dragRow.subStyleCode)
+    .toSorted(
+      (a, b) =>
+        a.displayOrder - b.displayOrder ||
+        a.subStyleCode.localeCompare(b.subStyleCode),
+    );
+  let targetIndex = siblings.length;
+
+  if (newRow?.subStyleCode) {
+    const newIndex = siblings.findIndex(
+      (row) => row.subStyleCode === newRow.subStyleCode,
+    );
+    if (newIndex < 0) {
+      return;
+    }
+    targetIndex = newIndex + offsetIndex;
+  }
+
+  const hideLoading = toast.loading('Updating...');
+  try {
+    await moveDictData({
+      subStyleCode: dragRow.subStyleCode,
+      targetIndex,
+    });
+    dictStore.refreshDict(selectedTypeCode.value);
+    toast.success($t('ui.actionMessage.operationSuccess'), { id: hideLoading });
+  } catch (error) {
+    toast.error(
+      (error as Error)?.message ?? $t('ui.actionMessage.operationFailed'),
+      { id: hideLoading },
+    );
+  } finally {
+    refreshDataGrid();
+  }
+}
 
 function onTypeActionClick({
   code,
   row,
-}: OnActionClickParams<SystemDictApi.SystemDictType>) {
+}: OnActionClickParams<TypeRow>) {
   switch (code) {
-    case 'data': {
-      selectType(row.code);
+    case 'addData': {
+      openDataForm(row.styleCode);
       break;
     }
     case 'delete': {
-      onDeleteType(row);
+      void onDeleteType(row);
       break;
     }
     case 'edit': {
@@ -203,10 +405,10 @@ function onTypeActionClick({
 function onDataActionClick({
   code,
   row,
-}: OnActionClickParams<SystemDictApi.SystemDictData>) {
+}: OnActionClickParams<DataRow>) {
   switch (code) {
     case 'delete': {
-      onDeleteData(row);
+      void onDeleteData(row);
       break;
     }
     case 'edit': {
@@ -220,74 +422,82 @@ function onCreateType() {
   typeFormModalApi.setData(null).open();
 }
 
+function openDataForm(styleCode: string) {
+  dataFormModalApi.setData({ styleCode }).open();
+}
+
 function onCreateData() {
-  if (!selectedCode.value) {
+  if (!selectedTypeCode.value) {
+    toast.info($t('system.dict.selectTypeFirst'));
     return;
   }
-  dataFormModalApi.setData({ dictCode: selectedCode.value }).open();
+  openDataForm(selectedTypeCode.value);
 }
 
-function refreshTypeGrid() {
-  typeGridApi.query();
-}
-
-function refreshDataGrid() {
-  dataGridApi.query();
-}
-
-async function onDeleteType(row: SystemDictApi.SystemDictType) {
+async function onDeleteType(row: TypeRow) {
   try {
     await vbenConfirm({
-      content: $t('system.dict.deleteCascadeTip'),
-      title: $t('ui.actionTitle.delete', [$t('system.dict.name')]),
+      content: $t('system.dict.deleteTip'),
+      title: $t('ui.actionTitle.delete', [row.styleName]),
     });
   } catch {
     return;
   }
   const hideLoading = toast.loading(
-    $t('ui.actionMessage.deleting', [row.name]),
+    $t('ui.actionMessage.deleting', [row.styleName]),
   );
   try {
-    await deleteDictType(row.id);
-    dictStore.refreshDict(row.code);
-    toast.success($t('ui.actionMessage.deleteSuccess', [row.name]), {
+    await deleteDictType(row.styleCode);
+    dictStore.refreshDict();
+    toast.success($t('ui.actionMessage.deleteSuccess', [row.styleName]), {
       id: hideLoading,
     });
+    if (selectedTypeCode.value === row.styleCode) {
+      selectType('', false);
+    }
     refreshTypeGrid();
-  } catch {
-    toast.dismiss(hideLoading);
+  } catch (error) {
+    toast.error(
+      (error as Error)?.message ?? $t('ui.actionMessage.operationFailed'),
+      { id: hideLoading },
+    );
   }
 }
 
-function onDeleteData(row: SystemDictApi.SystemDictData) {
-  const hideLoading = toast.loading(
-    $t('ui.actionMessage.deleting', [row.label]),
-  );
-  deleteDictData(row.id)
-    .then(() => {
-      dictStore.refreshDict(selectedCode.value);
-      toast.success($t('ui.actionMessage.deleteSuccess', [row.label]), {
-        id: hideLoading,
-      });
-      refreshDataGrid();
-    })
-    .catch(() => {
-      toast.dismiss(hideLoading);
+async function onDeleteData(row: DataRow) {
+  try {
+    await vbenConfirm({
+      content: $t('ui.actionMessage.deleteConfirm', [row.subStyleName]),
+      title: $t('ui.actionTitle.delete', [row.subStyleName]),
     });
+  } catch {
+    return;
+  }
+  const hideLoading = toast.loading(
+    $t('ui.actionMessage.deleting', [row.subStyleName]),
+  );
+  try {
+    await deleteDictData(row.subStyleCode);
+    dictStore.refreshDict(row.styleCode);
+    toast.success($t('ui.actionMessage.deleteSuccess', [row.subStyleName]), {
+      id: hideLoading,
+    });
+    refreshDataGrid();
+  } catch (error) {
+    toast.error(
+      (error as Error)?.message ?? $t('ui.actionMessage.operationFailed'),
+      { id: hideLoading },
+    );
+  }
 }
 </script>
 
 <template>
-  <ColPage
-    auto-content-height
-    :left-width="32"
-    :left-min-width="20"
-    :left-max-width="45"
-    :split-line="true"
-  >
+  <ColPage auto-content-height>
+    <TypeFormModal @success="refreshTypeGrid" />
+    <DataFormModal @success="refreshDataGrid" />
+
     <template #left>
-      <TypeFormModal @success="refreshTypeGrid" />
-      <DataFormModal @success="refreshDataGrid" />
       <TypeGrid :table-title="$t('system.dict.list')">
         <template #toolbar-tools>
           <Button
@@ -298,30 +508,19 @@ function onDeleteData(row: SystemDictApi.SystemDictData) {
             {{ $t('ui.actionTitle.create', [$t('system.dict.name')]) }}
           </Button>
         </template>
-        <template #code="{ row }">
-          <Button variant="link" size="sm" @click="selectType(row.code)">
-            {{ row.code }}
-          </Button>
-        </template>
       </TypeGrid>
     </template>
 
-    <DataGrid
-      :table-title="`${$t('system.dict.dataList')}${selectedCode ? ` - ${selectedCode}` : ''}`"
-    >
+    <DataGrid :table-title="$t('system.dict.dataList')">
       <template #toolbar-tools>
         <Button
           v-if="hasAccessByCodes(['SystemDict:create'])"
-          :disabled="!selectedCode"
+          :disabled="!selectedTypeCode"
           @click="onCreateData"
         >
           <Plus class="size-5" />
-          {{ $t('ui.actionTitle.create', [$t('system.dict.label')]) }}
+          {{ $t('system.dict.addData') }}
         </Button>
-      </template>
-      <template #label="{ row }">
-        <Tag v-if="row.color" :color="row.color">{{ row.label }}</Tag>
-        <span v-else>{{ row.label }}</span>
       </template>
     </DataGrid>
   </ColPage>

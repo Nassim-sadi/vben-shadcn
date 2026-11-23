@@ -11,8 +11,11 @@ export namespace SystemDeptApi {
   export interface SystemDept {
     [key: string]: any;
     children?: SystemDept[];
+    deptCode: string;
+    displayOrder: number;
     id: string;
     name: string;
+    pid?: string;
     remark?: string;
     status: 0 | 1;
   }
@@ -38,7 +41,10 @@ async function getDeptList() {
  * @param data Department data
  */
 async function createDept(
-  data: Omit<SystemDeptApi.SystemDept, 'children' | 'id'>,
+  data: Omit<
+    SystemDeptApi.SystemDept,
+    'children' | 'deptCode' | 'displayOrder' | 'id'
+  >,
 ) {
   if (USE_SAMPLE_DATA) {
     return createSampleDept(data);
@@ -54,7 +60,10 @@ async function createDept(
  */
 async function updateDept(
   id: string,
-  data: Omit<SystemDeptApi.SystemDept, 'children' | 'id'>,
+  data: Omit<
+    SystemDeptApi.SystemDept,
+    'children' | 'deptCode' | 'displayOrder' | 'id'
+  >,
 ) {
   if (USE_SAMPLE_DATA) {
     return updateSampleDept(id, data);

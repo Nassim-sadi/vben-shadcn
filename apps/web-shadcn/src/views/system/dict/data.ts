@@ -16,92 +16,91 @@ const COLOR_OPTIONS = [
   { label: 'default', value: 'default' },
 ];
 
-function getStatusOptions() {
-  return [
-    { label: $t('common.enabled'), value: 1 },
-    { label: $t('common.disabled'), value: 0 },
-  ];
-}
-
-/**
- * 获取字典类型搜索表单的字段配置
- */
-export function useTypeGridFormSchema(): VbenFormSchema[] {
+/** Left tree search form: dictionary types only. */
+export function useTypeTreeFormSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
-      fieldName: 'name',
-      label: $t('system.dict.dictName'),
+      fieldName: 'styleName',
+      label: $t('system.dict.styleName'),
     },
     {
       component: 'Input',
-      fieldName: 'code',
-      label: $t('system.dict.code'),
-    },
-    {
-      component: 'Select',
-      componentProps: {
-        allowClear: true,
-        options: getStatusOptions(),
-      },
-      fieldName: 'status',
-      label: $t('system.dict.status'),
+      fieldName: 'styleCode',
+      label: $t('system.dict.styleCode'),
     },
   ];
 }
 
-/**
- * 获取字典类型编辑表单的字段配置
- * @param getId 获取当前编辑的字典类型 ID，用于编码唯一性校验时排除自身
- */
+/** Right table search form: data rows of the selected type. */
+export function useDataSearchFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      fieldName: 'subStyleName',
+      label: $t('system.dict.subStyleName'),
+    },
+    {
+      component: 'Input',
+      fieldName: 'subStyleCode',
+      label: $t('system.dict.subStyleCode'),
+    },
+  ];
+}
+
+/** Dictionary type create/edit form. styleCode is the PK and is immutable. */
 export function useTypeFormSchema(
-  getId: () => SystemDictApi.SystemDictType['id'] | undefined,
+  getStyleCode: () => string | undefined,
 ): VbenFormSchema[] {
   return [
     {
       component: 'Input',
-      fieldName: 'name',
-      label: $t('system.dict.dictName'),
+      fieldName: 'styleName',
+      label: $t('system.dict.styleName'),
       rules: z
         .string()
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict.dictName'), 2]))
-        .max(
-          50,
-          $t('ui.formRules.maxLength', [$t('system.dict.dictName'), 50]),
-        ),
+        .min(2, $t('ui.formRules.minLength', [$t('system.dict.styleName'), 2]))
+        .max(50, $t('ui.formRules.maxLength', [$t('system.dict.styleName'), 50])),
     },
     {
       component: 'Input',
-      fieldName: 'code',
-      label: $t('system.dict.code'),
+      componentProps: () => ({ disabled: !!getStyleCode() }),
+      fieldName: 'styleCode',
+      label: $t('system.dict.styleCode'),
       rules: z
         .string()
         .regex(/^[a-z][a-z0-9_]*$/, $t('system.dict.codeFormat'))
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict.code'), 2]))
-        .max(50, $t('ui.formRules.maxLength', [$t('system.dict.code'), 50]))
+        .min(2, $t('ui.formRules.minLength', [$t('system.dict.styleCode'), 2]))
+        .max(50, $t('ui.formRules.maxLength', [$t('system.dict.styleCode'), 50]))
         .refine(
-          async (value: string) => {
-            return !(await isDictCodeExists(value, getId()));
-          },
+          async (value: string) => !(await isDictCodeExists(value, getStyleCode())),
           {
             error: (issue) =>
               $t('ui.formRules.alreadyExists', [
-                $t('system.dict.code'),
+                $t('system.dict.styleCode'),
                 issue.input,
               ]),
           },
         ),
     },
     {
-      component: 'RadioGroup',
+      component: 'Input',
       componentProps: {
-        buttonStyle: 'solid',
-        options: getStatusOptions(),
-        optionType: 'button',
+        placeholder: '0',
       },
-      defaultValue: 1,
-      fieldName: 'status',
-      label: $t('system.dict.status'),
+      defaultValue: '0',
+      fieldName: 'parentStyleCode',
+      label: $t('system.dict.parentCode'),
+      rules: 'required',
+    },
+    {
+      component: 'InputNumber',
+      componentProps: {
+        class: 'w-full',
+        min: 1,
+      },
+      fieldName: 'displayOrder',
+      label: $t('system.dict.displayOrder'),
     },
     {
       component: 'Textarea',
@@ -120,31 +119,93 @@ export function useTypeFormSchema(
   ];
 }
 
-/**
- * 获取字典类型表格列配置
- * @param onActionClick 表格操作按钮点击事件
- */
+/** Dictionary data create/edit form. subStyleCode is the PK and is immutable. */
+export function useDataFormSchema(
+  getSubStyleCode: () => string | undefined,
+): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      componentProps: {
+        disabled: true,
+      },
+      fieldName: 'styleCode',
+      label: $t('system.dict.styleCode'),
+    },
+    {
+      component: 'Input',
+      componentProps: () => ({ disabled: !!getSubStyleCode() }),
+      fieldName: 'subStyleCode',
+      label: $t('system.dict.subStyleCode'),
+      rules: 'required',
+    },
+    {
+      component: 'Input',
+      fieldName: 'subStyleName',
+      label: $t('system.dict.subStyleName'),
+      rules: z
+        .string()
+        .min(1, $t('ui.formRules.required', [$t('system.dict.subStyleName')]))
+        .max(50, $t('ui.formRules.maxLength', [$t('system.dict.subStyleName'), 50])),
+    },
+    {
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        class: 'w-full',
+        options: COLOR_OPTIONS,
+      },
+      fieldName: 'subStyleNameExt',
+      label: $t('system.dict.color'),
+    },
+    {
+      component: 'InputNumber',
+      componentProps: {
+        class: 'w-full',
+        min: 1,
+      },
+      fieldName: 'displayOrder',
+      label: $t('system.dict.displayOrder'),
+    },
+    {
+      component: 'Textarea',
+      componentProps: {
+        maxLength: 100,
+        rows: 3,
+        showCount: true,
+      },
+      fieldName: 'remark',
+      label: $t('system.dict.remark'),
+      rules: z
+        .string()
+        .max(100, $t('ui.formRules.maxLength', [$t('system.dict.remark'), 100]))
+        .optional(),
+    },
+  ];
+}
+
+/** Left sortable dictionary type tree columns. */
 export function useTypeColumns(
   onActionClick: OnActionClickFn<SystemDictApi.SystemDictType>,
 ): VxeTableGridColumns<SystemDictApi.SystemDictType> {
   const { hasAccessByCodes } = useAccess();
   return [
     {
-      field: 'name',
-      minWidth: 140,
-      title: $t('system.dict.dictName'),
+      dragSort: true,
+      field: 'styleName',
+      minWidth: 180,
+      title: $t('system.dict.styleName'),
+      treeNode: true,
     },
     {
-      field: 'code',
-      minWidth: 160,
-      slots: { default: 'code' },
-      title: $t('system.dict.code'),
+      field: 'styleCode',
+      minWidth: 150,
+      title: $t('system.dict.styleCode'),
     },
     {
-      cellRender: { name: 'CellTag' },
-      field: 'status',
-      title: $t('system.dict.status'),
-      width: 100,
+      field: 'displayOrder',
+      title: $t('system.dict.displayOrder'),
+      width: 90,
     },
     {
       field: 'remark',
@@ -154,22 +215,41 @@ export function useTypeColumns(
     {
       field: 'createTime',
       title: $t('system.dict.createTime'),
-      width: 180,
+      width: 170,
+    },
+    {
+      field: 'createUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.createUserCode || '',
+      title: $t('system.dict.createUser'),
+      width: 140,
+    },
+    {
+      field: 'updateTime',
+      title: $t('system.dict.updateTime'),
+      width: 170,
+    },
+    {
+      field: 'updateUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.updateUserCode || '',
+      title: $t('system.dict.updateUser'),
+      width: 140,
     },
     {
       align: 'center',
       cellRender: {
         attrs: {
-          nameField: 'name',
-          nameTitle: $t('system.dict.dictName'),
+          nameField: 'styleName',
+          nameTitle: $t('system.dict.styleName'),
           onClick: onActionClick,
         },
         name: 'CellOperation',
         options: [
           {
-            code: 'data',
-            text: $t('system.dict.data'),
-            show: () => hasAccessByCodes(['SystemDict']),
+            code: 'addData',
+            show: () => hasAccessByCodes(['SystemDict:create']),
+            text: $t('system.dict.addData'),
           },
           {
             code: 'edit',
@@ -191,139 +271,27 @@ export function useTypeColumns(
   ];
 }
 
-/**
- * 获取字典数据搜索表单的字段配置
- */
-export function useDataGridFormSchema(): VbenFormSchema[] {
-  return [
-    {
-      component: 'Input',
-      fieldName: 'label',
-      label: $t('system.dict.label'),
-    },
-    {
-      component: 'Select',
-      componentProps: {
-        allowClear: true,
-        options: getStatusOptions(),
-      },
-      fieldName: 'status',
-      label: $t('system.dict.status'),
-    },
-  ];
-}
-
-/**
- * 获取字典数据编辑表单的字段配置
- */
-export function useDataFormSchema(): VbenFormSchema[] {
-  return [
-    {
-      component: 'Input',
-      componentProps: {
-        disabled: true,
-      },
-      fieldName: 'dictCode',
-      label: $t('system.dict.code'),
-    },
-    {
-      component: 'Input',
-      fieldName: 'label',
-      label: $t('system.dict.label'),
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', [$t('system.dict.label')]))
-        .max(50, $t('ui.formRules.maxLength', [$t('system.dict.label'), 50])),
-    },
-    {
-      component: 'Input',
-      fieldName: 'value',
-      label: $t('system.dict.value'),
-      rules: 'required',
-    },
-    {
-      component: 'Select',
-      componentProps: {
-        allowClear: true,
-        class: 'w-full',
-        options: COLOR_OPTIONS,
-      },
-      fieldName: 'color',
-      label: $t('system.dict.color'),
-    },
-    {
-      component: 'InputNumber',
-      componentProps: {
-        class: 'w-full',
-        min: 0,
-      },
-      defaultValue: 0,
-      fieldName: 'sort',
-      label: $t('system.dict.sort'),
-    },
-    {
-      component: 'RadioGroup',
-      componentProps: {
-        buttonStyle: 'solid',
-        options: getStatusOptions(),
-        optionType: 'button',
-      },
-      defaultValue: 1,
-      fieldName: 'status',
-      label: $t('system.dict.status'),
-    },
-    {
-      component: 'Textarea',
-      componentProps: {
-        maxLength: 100,
-        rows: 3,
-        showCount: true,
-      },
-      fieldName: 'remark',
-      label: $t('system.dict.remark'),
-      rules: z
-        .string()
-        .max(100, $t('ui.formRules.maxLength', [$t('system.dict.remark'), 100]))
-        .optional(),
-    },
-  ];
-}
-
-/**
- * 获取字典数据表格列配置
- * @param onActionClick 表格操作按钮点击事件
- */
+/** Right dictionary data table columns. */
 export function useDataColumns(
   onActionClick: OnActionClickFn<SystemDictApi.SystemDictData>,
 ): VxeTableGridColumns<SystemDictApi.SystemDictData> {
   const { hasAccessByCodes } = useAccess();
   return [
     {
-      field: 'label',
-      minWidth: 120,
-      slots: { default: 'label' },
-      title: $t('system.dict.label'),
+      dragSort: true,
+      field: 'subStyleName',
+      minWidth: 180,
+      title: $t('system.dict.subStyleName'),
     },
     {
-      field: 'value',
-      minWidth: 100,
-      title: $t('system.dict.value'),
+      field: 'subStyleCode',
+      minWidth: 150,
+      title: $t('system.dict.subStyleCode'),
     },
     {
-      field: 'color',
-      minWidth: 100,
-      title: $t('system.dict.color'),
-    },
-    {
-      field: 'sort',
-      title: $t('system.dict.sort'),
-      width: 80,
-    },
-    {
-      cellRender: { name: 'CellTag' },
-      field: 'status',
-      title: $t('system.dict.status'),
-      width: 100,
+      field: 'displayOrder',
+      title: $t('system.dict.displayOrder'),
+      width: 90,
     },
     {
       field: 'remark',
@@ -333,27 +301,53 @@ export function useDataColumns(
     {
       field: 'createTime',
       title: $t('system.dict.createTime'),
-      width: 180,
+      width: 170,
+    },
+    {
+      field: 'createUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.createUserCode || '',
+      title: $t('system.dict.createUser'),
+      width: 140,
+    },
+    {
+      field: 'updateTime',
+      title: $t('system.dict.updateTime'),
+      width: 170,
+    },
+    {
+      field: 'updateUserName',
+      formatter: ({ cellValue, row }) =>
+        cellValue || row.updateUserCode || '',
+      title: $t('system.dict.updateUser'),
+      width: 140,
     },
     {
       align: 'center',
       cellRender: {
         attrs: {
-          nameField: 'label',
-          nameTitle: $t('system.dict.label'),
+          nameField: 'subStyleName',
+          nameTitle: $t('system.dict.subStyleName'),
           onClick: onActionClick,
         },
         name: 'CellOperation',
         options: [
-          { code: 'edit', show: () => hasAccessByCodes(['SystemDict:edit']) },
-          { code: 'delete', show: () => hasAccessByCodes(['SystemDict:delete']) },
+          {
+            code: 'edit',
+            show: () => hasAccessByCodes(['SystemDict:edit']),
+          },
+          {
+            code: 'delete',
+            popConfirm: false,
+            show: () => hasAccessByCodes(['SystemDict:delete']),
+          },
         ],
       },
       field: 'operation',
       fixed: 'right',
       showOverflow: false,
       title: $t('system.dict.operation'),
-      width: 150,
+      width: 160,
     },
   ];
 }

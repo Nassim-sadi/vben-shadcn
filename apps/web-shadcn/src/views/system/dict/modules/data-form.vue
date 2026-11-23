@@ -18,18 +18,18 @@ const emit = defineEmits<{
 const dictStore = useDictStore();
 const formData = ref<SystemDictApi.SystemDictData>();
 type DictDataModalData =
-  | Pick<SystemDictApi.SystemDictData, 'dictCode'>
+  | Pick<SystemDictApi.SystemDictData, 'styleCode'>
   | SystemDictApi.SystemDictData;
 
 const getTitle = computed(() => {
-  return formData.value?.id
-    ? $t('ui.actionTitle.edit', [$t('system.dict.label')])
-    : $t('ui.actionTitle.create', [$t('system.dict.label')]);
+  return formData.value?.subStyleCode
+    ? $t('ui.actionTitle.edit', [$t('system.dict.subStyleName')])
+    : $t('ui.actionTitle.create', [$t('system.dict.subStyleName')]);
 });
 
 const [Form, formApi] = useVbenForm({
   commonConfig: { labelWidth: 'auto' },
-  schema: useDataFormSchema(),
+  schema: useDataFormSchema(() => formData.value?.subStyleCode),
   showDefaultActions: false,
 });
 
@@ -42,13 +42,21 @@ const [Modal, modalApi] = useVbenModal<DictDataModalData>({
     modalApi.lock();
     const values = (await formApi.getValues()) as Omit<
       SystemDictApi.SystemDictData,
-      'createTime' | 'id'
+      | 'createTime'
+      | 'createUserCode'
+      | 'createUserName'
+      | 'id'
+      | 'updateTime'
+      | 'updateUserCode'
+      | 'updateUserName'
     >;
     try {
-      await (formData.value?.id
-        ? updateDictData(formData.value.id, values)
-        : createDictData(values));
-      dictStore.refreshDict(values.dictCode);
+      if (formData.value?.subStyleCode) {
+        await updateDictData(formData.value.subStyleCode, values);
+      } else {
+        await createDictData(values);
+      }
+      dictStore.refreshDict(values.styleCode);
       modalApi.close();
       emit('success');
     } finally {
@@ -59,8 +67,11 @@ const [Modal, modalApi] = useVbenModal<DictDataModalData>({
     if (isOpen) {
       const data = modalApi.getData();
       if (data) {
-        formData.value = 'id' in data ? data : undefined;
+        formData.value = 'subStyleCode' in data ? data : undefined;
         formApi.setValues(data);
+      } else {
+        formData.value = undefined;
+        formApi.reset();
       }
     }
   },

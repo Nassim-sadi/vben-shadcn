@@ -1,7 +1,7 @@
 import type { SystemUserApi } from './user';
 
 import { formatDateTime, inTimeRange, paginate } from '../sample-helpers';
-import { getSampleDeptIds } from './dept.sample';
+import { getSampleDeptIds, getSampleDeptName } from './dept.sample';
 import { getSampleRoleCodes } from './role.sample';
 
 /**
@@ -40,6 +40,12 @@ const NAMES = [
 
 const SAMPLE_SIZE = 24;
 
+function sampleGenderName(gender?: number | string): string {
+  if (gender === 1 || gender === '1') return 'Male';
+  if (gender === 2 || gender === '2') return 'Female';
+  return '';
+}
+
 function buildInitialUsers(): SystemUser[] {
   const deptIds = getSampleDeptIds();
   const roleCodes = getSampleRoleCodes();
@@ -53,8 +59,10 @@ function buildInitialUsers(): SystemUser[] {
       userCode: `UC-${String(index + 1).padStart(4, '0')}`,
       roleCode: roleCodes[index % roleCodes.length] as string,
       gender: (index % 3) as 0 | 1 | 2,
+      genderName: sampleGenderName(index % 3),
       status: index % 4 === 3 ? 0 : 1,
       deptId: deptIds[index % deptIds.length] as string,
+      deptName: getSampleDeptName(deptIds[index % deptIds.length] as string),
       remark: index % 3 === 0 ? 'Key account manager.' : undefined,
       permissions: [],
       createTime: formatDateTime(created),
@@ -75,6 +83,8 @@ export interface SampleUserQueryParams {
   name?: string;
   page?: number | string;
   pageSize?: number | string;
+  sortBy?: string;
+  sortOrder?: string;
   startTime?: string;
   status?: number | string;
   userCode?: string;
@@ -129,6 +139,17 @@ export function querySampleUsers(params: SampleUserQueryParams = {}) {
     inTimeRange(item.createTime ?? '', params.startTime, params.endTime),
   );
 
+  if (params.sortBy) {
+    const direction = params.sortOrder === 'asc' ? 1 : -1;
+    const field = params.sortBy;
+    filtered = [...filtered].sort((a, b) => {
+      const left = (a as unknown as Record<string, unknown>)[field];
+      const right = (b as unknown as Record<string, unknown>)[field];
+      const byValue = String(left ?? '').localeCompare(String(right ?? ''));
+      return (byValue || a.userCode.localeCompare(b.userCode)) * direction;
+    });
+  }
+
   return paginate(filtered, params.page, params.pageSize);
 }
 
@@ -151,7 +172,9 @@ export function querySampleUserExportPage(after?: string, limit?: number) {
         createTime: item.createTime,
         createUserName: 'Sample',
         deptCode: item.deptId ?? '',
+        deptName: item.deptName ?? getSampleDeptName(item.deptId),
         gender: item.gender ?? 0,
+        genderName: item.genderName ?? sampleGenderName(item.gender),
         id: item.id,
         mobile: item.mobile,
         name: item.name,
@@ -174,6 +197,8 @@ export function createSampleUser(data: Omit<SystemUser, 'id'>): SystemUser {
   sequence += 1;
   const created = {
     ...data,
+    deptName: getSampleDeptName(data.deptId),
+    genderName: sampleGenderName(data.gender),
     id: `sample-user-${sequence}`,
     createTime: formatDateTime(new Date()),
   } as unknown as SystemUser;
@@ -186,10 +211,19 @@ export function updateSampleUser(
   data: Partial<Omit<SystemUser, 'id'>>,
 ): null | SystemUser {
   const index = userStore.findIndex((item) => item.id === id);
-  if (index === -1) {
+  const current = userStore[index];
+  if (!current) {
     return null;
   }
-  const updated = { ...userStore[index], ...data, id } as SystemUser;
+  const deptName =
+    data.deptId === undefined
+      ? current.deptName
+      : getSampleDeptName(data.deptId);
+  const genderName =
+    data.gender === undefined
+      ? current.genderName
+      : sampleGenderName(data.gender);
+  const updated = { ...current, ...data, deptName, genderName, id } as SystemUser;
   userStore[index] = updated;
   return structuredClone(updated);
 }

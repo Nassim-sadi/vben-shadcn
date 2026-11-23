@@ -61,7 +61,7 @@ const [Modal, modalApi] = useVbenModal<DeptModalData>({
         formData.value = 'id' in data ? data : undefined;
         const formValues = {
           ...data,
-          ...(data.pid === 0 ? { pid: undefined } : {}),
+          ...(data.pid === '0' ? { pid: undefined } : {}),
         };
         formApi.setValues(formValues);
       } else {

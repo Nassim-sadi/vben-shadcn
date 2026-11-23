@@ -63,7 +63,10 @@ const activeSort = ref<undefined | { field: string; order: string }>();
 function onOpenChange(isOpen: boolean) {
   open.value = isOpen;
   if (isOpen) {
-    const sortState = (props.gridApi.grid?.sortConfig as Array<{ field?: string; order?: string }> | undefined) ?? [];
+    const sortState = (props.gridApi.grid?.getSortColumns?.() ?? []) as Array<{
+      field?: string;
+      order?: string;
+    }>;
     const first = sortState[0];
     activeSort.value =
       first?.field && first?.order
@@ -72,9 +75,12 @@ function onOpenChange(isOpen: boolean) {
   }
 }
 
-function sortBy(option: SortOption) {
+async function sortBy(option: SortOption) {
   activeSort.value = { field: option.field, order: option.order };
-  props.gridApi.grid?.sort(option.field, option.order);
+  // grid.sort() only updates the column state; it does not emit sort-change,
+  // so trigger the remote proxy query explicitly (arrows do this themselves).
+  await props.gridApi.grid?.sort(option.field, option.order);
+  props.gridApi.query();
   open.value = false;
 }
 

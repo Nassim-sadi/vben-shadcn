@@ -17,7 +17,9 @@ export namespace SystemUserApi {
     createUserCode?: string;
     createUserName?: string;
     deptId?: string;
+    deptName?: string;
     gender?: 0 | 1 | 2;
+    genderName?: string;
     id: string;
     mobile?: string;
     name: string;
@@ -38,7 +40,9 @@ export namespace SystemUserApi {
     createTime?: string;
     createUserName?: string;
     deptCode?: string;
+    deptName?: string;
     gender: number;
+    genderName?: string;
     id: string;
     mobile?: string;
     name: string;

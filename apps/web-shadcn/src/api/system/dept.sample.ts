@@ -20,6 +20,11 @@ function nextId(): string {
   return `sample-dept-${sequence}`;
 }
 
+function sampleDeptFields(id: string) {
+  const suffix = id.replace('sample-dept-', '');
+  return { deptCode: `D${suffix}`, displayOrder: Number(suffix) || 0 };
+}
+
 function buildInitialTree(): SystemDept[] {
   const now = formatDateTime(new Date());
   const node = (
@@ -28,7 +33,15 @@ function buildInitialTree(): SystemDept[] {
     status: 0 | 1,
     remark?: string,
     children?: SystemDept[],
-  ): SystemDept => ({ children, id, name, remark, status, createTime: now });
+  ): SystemDept => ({
+    children,
+    createTime: now,
+    id,
+    name,
+    remark,
+    status,
+    ...sampleDeptFields(id),
+  });
 
   return [
     node('sample-dept-1', 'Headquarters', 1, 'Company headquarters', [
@@ -56,12 +69,22 @@ export function getSampleDeptList(): SystemDept[] {
   return structuredClone(deptTree);
 }
 
+/** Looks up a department label for sample users. */
+export function getSampleDeptName(id?: string): string {
+  if (!id) {
+    return '';
+  }
+  return findTreeById(deptTree, id)?.name ?? '';
+}
+
 export function createSampleDept(
-  data: Omit<SystemDept, 'children' | 'id'>,
+  data: Omit<SystemDept, 'children' | 'deptCode' | 'displayOrder' | 'id'>,
 ): SystemDept {
+  const id = nextId();
   const created = {
     ...data,
-    id: nextId(),
+    ...sampleDeptFields(id),
+    id,
     createTime: formatDateTime(new Date()),
   } as unknown as SystemDept;
   const parentId = (data as Record<string, any>).pid;
@@ -77,7 +100,9 @@ export function createSampleDept(
 
 export function updateSampleDept(
   id: string,
-  data: Partial<Omit<SystemDept, 'children' | 'id'>>,
+  data: Partial<
+    Omit<SystemDept, 'children' | 'deptCode' | 'displayOrder' | 'id'>
+  >,
 ): null | SystemDept {
   const current = findTreeById(deptTree, id);
   if (!current) {

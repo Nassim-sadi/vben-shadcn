@@ -90,6 +90,17 @@ export function useColumns(
       width: 150,
     },
     {
+      field: 'deptCode',
+      title: $t('system.dept.deptCode'),
+      width: 130,
+    },
+    {
+      align: 'right',
+      field: 'displayOrder',
+      title: $t('system.dept.order'),
+      width: 90,
+    },
+    {
       cellRender: { name: 'CellTag' },
       field: 'status',
       title: $t('system.dept.status'),
