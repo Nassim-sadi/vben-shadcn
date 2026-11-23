@@ -44,7 +44,7 @@ async function createDept(
   data: Omit<
     SystemDeptApi.SystemDept,
     'children' | 'deptCode' | 'displayOrder' | 'id'
-  >,
+  > & { displayOrder?: number },
 ) {
   if (USE_SAMPLE_DATA) {
     return createSampleDept(data);
@@ -63,7 +63,7 @@ async function updateDept(
   data: Omit<
     SystemDeptApi.SystemDept,
     'children' | 'deptCode' | 'displayOrder' | 'id'
-  >,
+  > & { displayOrder?: number },
 ) {
   if (USE_SAMPLE_DATA) {
     return updateSampleDept(id, data);

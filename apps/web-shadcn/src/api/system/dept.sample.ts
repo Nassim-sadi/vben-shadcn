@@ -78,12 +78,14 @@ export function getSampleDeptName(id?: string): string {
 }
 
 export function createSampleDept(
-  data: Omit<SystemDept, 'children' | 'deptCode' | 'displayOrder' | 'id'>,
+  data: Omit<SystemDept, 'children' | 'deptCode' | 'displayOrder' | 'id'> & {
+    displayOrder?: number;
+  },
 ): SystemDept {
   const id = nextId();
   const created = {
-    ...data,
     ...sampleDeptFields(id),
+    ...data,
     id,
     createTime: formatDateTime(new Date()),
   } as unknown as SystemDept;
@@ -101,7 +103,9 @@ export function createSampleDept(
 export function updateSampleDept(
   id: string,
   data: Partial<
-    Omit<SystemDept, 'children' | 'deptCode' | 'displayOrder' | 'id'>
+    Omit<SystemDept, 'children' | 'deptCode' | 'displayOrder' | 'id'> & {
+      displayOrder?: number;
+    }
   >,
 ): null | SystemDept {
   const current = findTreeById(deptTree, id);

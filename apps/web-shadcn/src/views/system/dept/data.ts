@@ -41,6 +41,15 @@ export function useSchema(): VbenFormSchema[] {
       label: $t('system.dept.parentDept'),
     },
     {
+      component: 'InputNumber',
+      componentProps: {
+        class: 'w-full',
+        min: 1,
+      },
+      fieldName: 'displayOrder',
+      label: $t('system.dept.order'),
+    },
+    {
       component: 'RadioGroup',
       componentProps: {
         buttonStyle: 'solid',
