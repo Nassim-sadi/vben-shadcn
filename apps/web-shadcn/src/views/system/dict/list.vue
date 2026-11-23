@@ -119,18 +119,16 @@ function refreshDataGrid() {
 
 const [TypeGrid, typeGridApi] = useVbenVxeGrid({
   formOptions: {
-    actionLayout: 'newLine',
-    actionWrapperClass: 'pb-1',
-    collapsed: true,
+    collapsed: false,
     commonConfig: {
       formItemClass: 'pb-1',
-      labelClass: 'whitespace-nowrap',
-      labelWidth: 100,
+      hideLabel: true,
     },
     schema: useTypeTreeFormSchema(),
-    showCollapseButton: true,
+    showCollapseButton: false,
+    showDefaultActions: false,
     submitOnChange: true,
-    wrapperClass: 'grid-cols-1',
+    wrapperClass: 'grid-cols-2',
   },
   gridEvents: {
     cellClick: ({ row }: { row?: TypeRow }) => {

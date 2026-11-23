@@ -21,11 +21,17 @@ export function useTypeTreeFormSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
+      componentProps: {
+        placeholder: $t('system.dict.styleName'),
+      },
       fieldName: 'styleName',
       label: $t('system.dict.styleName'),
     },
     {
       component: 'Input',
+      componentProps: {
+        placeholder: $t('system.dict.styleCode'),
+      },
       fieldName: 'styleCode',
       label: $t('system.dict.styleCode'),
     },
