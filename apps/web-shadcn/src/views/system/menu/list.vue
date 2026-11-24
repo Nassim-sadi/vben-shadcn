@@ -249,6 +249,19 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
   </Page>
 </template>
 <style lang="scss" scoped>
+:deep(.vxe-tree-cell),
+:deep(.vxe-cell--tree-node) {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: 0;
+  width: 100%;
+}
+
+:deep(.vxe-cell--drag-handle) {
+  flex-shrink: 0;
+}
+
 .menu-badge {
   & > :deep(div) {
     padding-top: 0;
