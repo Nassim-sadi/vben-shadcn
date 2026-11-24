@@ -17,6 +17,7 @@ import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteRole, getRoleList } from '#/api';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
 
@@ -42,6 +43,8 @@ const [PermissionsModal, permissionsModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
+const columnsFactory = () => useColumns(onActionClick);
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: true,
@@ -50,7 +53,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useColumns(onActionClick),
+    columns: columnsFactory(),
     height: 'auto',
     keepSource: true,
     pagerConfig: {
@@ -149,6 +152,10 @@ function onCreate() {
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.role.name')]) }}
         </Button>
+        <ResetColumnWidthButton
+          :columns-factory="columnsFactory"
+          :grid-api="gridApi"
+        />
       </template>
     </Grid>
   </Page>

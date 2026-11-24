@@ -14,13 +14,14 @@ import { $t } from '@vben/locales';
 import { MenuBadge } from '@vben-core/menu-ui';
 import { Button } from '@vben-core/shadcn-ui';
 
-import { useVbenVxeGrid, useTableColumnWidths } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   deleteMenu,
   getMenuList,
   moveMenu,
   SystemMenuApi,
 } from '#/api/system/menu';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { refreshAccessibleRoutes } from '#/router/refresh';
 
 import { useColumns } from './data';
@@ -90,12 +91,14 @@ async function onMenuRowDragEnd({
   }
 }
 
+const columnsFactory = () => useColumns(onActionClick);
+
 const [Grid, gridApi] = useVbenVxeGrid({
   gridEvents: {
     rowDragend: onMenuRowDragEnd,
   },
   gridOptions: {
-    columns: useColumns(onActionClick),
+    columns: columnsFactory(),
     height: '100%',
     keepSource: true,
     pagerConfig: {
@@ -135,8 +138,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
   } as VxeTableGridOptions,
 });
 
-const { resetWidths } = useTableColumnWidths();
-
 function onActionClick({
   code,
   row,
@@ -172,11 +173,6 @@ async function onMenuChanged() {
   await refreshAccessibleRoutes();
 }
 
-function onResetColumnWidths() {
-  resetWidths();
-  gridApi.setGridOptions({ columns: useColumns(onActionClick) });
-  toast.success($t('common.reset'));
-}
 function onEdit(row: SystemMenuApi.SystemMenu) {
   formModalApi.setData(row).open();
 }
@@ -214,10 +210,10 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.menu.name')]) }}
         </Button>
-        <Button variant="ghost" @click="onResetColumnWidths">
-          <IconifyIcon class="size-5" icon="lucide:columns-3" />
-          {{ $t('ui.actionTitle.resetColumnWidth') }}
-        </Button>
+        <ResetColumnWidthButton
+          :columns-factory="columnsFactory"
+          :grid-api="gridApi"
+        />
       </template>
       <template #title="{ row }">
         <div class="flex min-w-0 flex-1 items-center gap-1">

@@ -8,11 +8,14 @@ import { Page } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getLogList } from '#/api';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { $t } from '#/locales';
 
 import { useLogColumns, useLogGridFormSchema } from './data';
 
-const [Grid] = useVbenVxeGrid({
+const columnsFactory = () => useLogColumns();
+
+const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: true,
     showCollapseButton: true,
@@ -20,7 +23,7 @@ const [Grid] = useVbenVxeGrid({
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useLogColumns(),
+    columns: columnsFactory(),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -50,6 +53,13 @@ const [Grid] = useVbenVxeGrid({
 
 <template>
   <Page auto-content-height>
-    <Grid :table-title="$t('system.log.list')" />
+    <Grid :table-title="$t('system.log.list')">
+      <template #toolbar-tools>
+        <ResetColumnWidthButton
+          :columns-factory="columnsFactory"
+          :grid-api="gridApi"
+        />
+      </template>
+    </Grid>
   </Page>
 </template>

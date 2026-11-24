@@ -6,6 +6,7 @@ export { default as InputNumberField } from './InputNumberField.vue';
 export { default as InputSearch } from './InputSearch.vue';
 export { default as RadioGroupField } from './RadioGroupField.vue';
 export { default as RangePickerField } from './RangePickerField.vue';
+export { default as ResetColumnWidthButton } from './ResetColumnWidthButton.vue';
 export { default as SelectField } from './SelectField.vue';
 export { default as SortDropdown } from './SortDropdown.vue';
 export { default as Spin } from './Spin.vue';

@@ -16,6 +16,7 @@ import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteDataDisplayItem, getDataDisplayList } from '#/api/data-display';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { $t } from '#/locales';
 import { createDateRangeCodec } from '#/utils/date-range-codec';
 
@@ -39,6 +40,8 @@ const [FormDrawer, formDrawerApi] = useVbenDrawer({
   destroyOnClose: true,
 });
 
+const columnsFactory = () => useColumns(onActionClick);
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     codec: searchCodec,
@@ -46,7 +49,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useColumns(onActionClick),
+    columns: columnsFactory(),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -126,6 +129,10 @@ function onCreate() {
           <Plus class="mr-2 size-4" />
           {{ $t('page.dataDisplay.addNew') }}
         </Button>
+        <ResetColumnWidthButton
+          :columns-factory="columnsFactory"
+          :grid-api="gridApi"
+        />
       </template>
     </Grid>
   </Page>

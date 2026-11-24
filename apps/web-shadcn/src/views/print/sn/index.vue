@@ -16,7 +16,7 @@ import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { Card, SelectField } from '#/components/ui/app';
+import { Card, ResetColumnWidthButton, SelectField } from '#/components/ui/app';
 import { $t } from '#/locales';
 
 import { SN_LIST, useColumns } from './data';
@@ -47,6 +47,8 @@ const current = ref<SnRecord>();
 const labelType = ref<LabelType>('both');
 const previewBarcodeRef = ref<null | SVGSVGElement>(null);
 const previewQrUrl = ref('');
+
+const columnsFactory = () => useColumns();
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
@@ -81,7 +83,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
   },
   gridOptions: {
-    columns: useColumns(),
+    columns: columnsFactory(),
     height: 'auto',
     proxyConfig: {
       ajax: {
@@ -243,7 +245,14 @@ async function onPrint() {
   <Page auto-content-height>
     <div class="flex size-full gap-4">
       <div class="w-2/3 min-w-0">
-        <Grid :table-title="$t('page.print.sn.title')" />
+        <Grid :table-title="$t('page.print.sn.title')">
+          <template #toolbar-tools>
+            <ResetColumnWidthButton
+              :columns-factory="columnsFactory"
+              :grid-api="gridApi"
+            />
+          </template>
+        </Grid>
       </div>
 
       <Card class="w-1/3 overflow-auto">

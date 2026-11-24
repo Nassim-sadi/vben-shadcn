@@ -24,7 +24,12 @@ import {
   getUserList,
   updateUser,
 } from '#/api';
-import { Card, InputSearch, SortDropdown } from '#/components/ui/app';
+import {
+  Card,
+  InputSearch,
+  ResetColumnWidthButton,
+  SortDropdown,
+} from '#/components/ui/app';
 import { TABLE } from '#/constants/table';
 import { $t } from '#/locales';
 
@@ -109,6 +114,8 @@ const [ExportProgressModal, exportModalApi] = useVbenModal({
   onBeforeClose: requestExportClose,
 });
 
+const columnsFactory = () => useColumns(onStatusChange);
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: false,
@@ -122,7 +129,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useColumns(onStatusChange),
+    columns: columnsFactory(),
     height: 'auto',
     keepSource: true,
     pagerConfig: {
@@ -455,6 +462,10 @@ async function handleExport() {
               {{ $t('common.export') }}
             </Button>
             <SortDropdown :gridApi="gridApi" />
+            <ResetColumnWidthButton
+              :columns-factory="columnsFactory"
+              :grid-api="gridApi"
+            />
           </template>
           <template #action="{ row }">
             <VbenTableAction :actions="[

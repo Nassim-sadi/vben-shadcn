@@ -16,6 +16,7 @@ import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteClass, getClassesList } from '#/api';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { $t } from '#/locales';
 
 import { useClassesColumns, useClassesGridFormSchema } from './data';
@@ -26,6 +27,8 @@ const [FormModal, formModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
+const columnsFactory = () => useClassesColumns(onActionClick);
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     collapsed: true,
@@ -34,7 +37,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useClassesColumns(onActionClick),
+    columns: columnsFactory(),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -124,6 +127,10 @@ function refreshGrid() {
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.classes.name')]) }}
         </Button>
+        <ResetColumnWidthButton
+          :columns-factory="columnsFactory"
+          :grid-api="gridApi"
+        />
       </template>
     </Grid>
   </Page>

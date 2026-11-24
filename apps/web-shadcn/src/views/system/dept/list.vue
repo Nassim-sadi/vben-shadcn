@@ -15,6 +15,7 @@ import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteDept, getDeptList, moveDeptBatch } from '#/api/system/dept';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { $t } from '#/locales';
 
 import { useColumns } from './data';
@@ -154,12 +155,14 @@ async function onDeptRowDragEnd({
   }
 }
 
+const columnsFactory = () => useColumns(onActionClick);
+
 const [Grid, gridApi] = useVbenVxeGrid({
   gridEvents: {
     rowDragend: onDeptRowDragEnd,
   },
   gridOptions: {
-    columns: useColumns(onActionClick),
+    columns: columnsFactory(),
     height: 'auto',
     keepSource: true,
     pagerConfig: {
@@ -218,6 +221,10 @@ function refreshGrid() {
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.dept.name')]) }}
         </Button>
+        <ResetColumnWidthButton
+          :columns-factory="columnsFactory"
+          :grid-api="gridApi"
+        />
       </template>
     </Grid>
   </Page>

@@ -28,6 +28,7 @@ import {
   moveDictData,
   moveDictType,
 } from '#/api';
+import { ResetColumnWidthButton } from '#/components/ui/app';
 import { $t } from '#/locales';
 
 import {
@@ -117,6 +118,9 @@ function refreshDataGrid() {
   void dataGridApi.query();
 }
 
+const typeColumnsFactory = () => useTypeColumns(onTypeActionClick);
+const dataColumnsFactory = () => useDataColumns(onDataActionClick);
+
 const [TypeGrid, typeGridApi] = useVbenVxeGrid({
   showSearchForm: false,
   formOptions: {
@@ -145,7 +149,7 @@ const [TypeGrid, typeGridApi] = useVbenVxeGrid({
     rowDragend: onTypeRowDragEnd,
   },
   gridOptions: {
-    columns: useTypeColumns(onTypeActionClick),
+    columns: typeColumnsFactory(),
     height: 'auto',
     keepSource: true,
     pagerConfig: { enabled: false },
@@ -226,7 +230,7 @@ const [DataGrid, dataGridApi] = useVbenVxeGrid({
     rowDragend: onDataRowDragEnd,
   },
   gridOptions: {
-    columns: useDataColumns(onDataActionClick),
+    columns: dataColumnsFactory(),
     height: 'auto',
     keepSource: true,
     pagerConfig: { enabled: false },
@@ -523,6 +527,10 @@ async function onDeleteData(row: DataRow) {
             <Plus class="size-5" />
             {{ $t('ui.actionTitle.create', [$t('system.dict.name')]) }}
           </Button>
+          <ResetColumnWidthButton
+            :columns-factory="typeColumnsFactory"
+            :grid-api="typeGridApi"
+          />
         </template>
       </TypeGrid>
     </template>
@@ -537,6 +545,10 @@ async function onDeleteData(row: DataRow) {
           <Plus class="size-5" />
           {{ $t('system.dict.addData') }}
         </Button>
+        <ResetColumnWidthButton
+          :columns-factory="dataColumnsFactory"
+          :grid-api="dataGridApi"
+        />
       </template>
     </DataGrid>
   </ColPage>
