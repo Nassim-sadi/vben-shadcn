@@ -238,7 +238,7 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
           </span>
           <MenuBadge
             v-if="row.meta?.badgeType"
-            class="menu-badge ml-auto shrink-0"
+            class="menu-badge !static ml-auto shrink-0"
             :badge="row.meta.badge"
             :badge-type="row.meta.badgeType"
             :badge-variants="row.meta.badgeVariants"
