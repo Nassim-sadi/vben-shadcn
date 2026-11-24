@@ -323,6 +323,50 @@ export function deleteSampleMenu(id: string): boolean {
   return remove(menuTree);
 }
 
+export function moveSampleMenu(move: SystemMenuApi.MenuMove): SystemMenu | null {
+  const isDescendant = (ancestorId: string, candidateId: string): boolean => {
+    let current: string | undefined = candidateId;
+    let guard = 0;
+    while (current && current !== '0' && guard++ < 100) {
+      if (current === ancestorId) return true;
+      current = findTreeById(menuTree, current)?.pid;
+    }
+    return false;
+  };
+
+  const node = findTreeById(menuTree, move.menuCode);
+  if (!node) return null;
+  const oldPid = node.pid || '0';
+  const newPid = move.pid || '0';
+  if (newPid === node.id || isDescendant(node.id, newPid)) return null;
+  const parent = newPid === '0' ? undefined : findTreeById(menuTree, newPid);
+  if (newPid !== '0' && !parent) return null;
+  if (parent?.type === 'button') return null;
+
+  const oldSiblings =
+    oldPid === '0' ? menuTree : (findTreeById(menuTree, oldPid)?.children ?? []);
+  const oldIndex = oldSiblings.findIndex((n) => n.id === node.id);
+  if (oldIndex >= 0) oldSiblings.splice(oldIndex, 1);
+
+  let newSiblings: SystemMenu[];
+  if (newPid === '0') {
+    newSiblings = menuTree;
+  } else {
+    parent!.children = parent!.children ?? [];
+    newSiblings = parent!.children;
+  }
+  const at = Math.max(0, Math.min(move.targetIndex, newSiblings.length));
+  newSiblings.splice(at, 0, node);
+  node.pid = newPid;
+  oldSiblings.forEach((n, i) => {
+    n.meta = { ...n.meta, order: i + 1 };
+  });
+  newSiblings.forEach((n, i) => {
+    n.meta = { ...n.meta, order: i + 1 };
+  });
+  return structuredClone(node);
+}
+
 export function getSampleMenuIds(): string[] {
   return flattenTreeIds(menuTree);
 }

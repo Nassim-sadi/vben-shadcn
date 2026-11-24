@@ -8,6 +8,7 @@ import {
   getSampleMenuList,
   isSampleMenuNameExists,
   isSampleMenuPathExists,
+  moveSampleMenu,
   updateSampleMenu,
 } from './menu.sample';
 
@@ -41,6 +42,12 @@ export namespace SystemMenuApi {
     component?: string;
     /** Menu ID */
     id: string;
+    createTime?: string;
+    createUserCode?: string;
+    createUserName?: string;
+    updateTime?: string;
+    updateUserCode?: string;
+    updateUserName?: string;
     /** Menu metadata */
     meta?: {
       /** Icon displayed when active */
@@ -96,6 +103,12 @@ export namespace SystemMenuApi {
     redirect?: string;
     /** Menu type */
     type: (typeof MenuTypes)[number];
+  }
+  /** Single drag-and-drop menu reorder move. */
+  export interface MenuMove {
+    menuCode: string;
+    pid: string;
+    targetIndex: number;
   }
 }
 
@@ -178,11 +191,20 @@ async function deleteMenu(id: string) {
   return requestClient.delete(`/system/menu/${id}`);
 }
 
+/** Move a menu to a new parent/position (raw drag-and-drop). */
+async function moveMenu(data: SystemMenuApi.MenuMove) {
+  if (USE_SAMPLE_DATA) {
+    return moveSampleMenu(data);
+  }
+  return requestClient.put<SystemMenuApi.SystemMenu>('/system/menu/move', data);
+}
+
 export {
   createMenu,
   deleteMenu,
   getMenuList,
   isMenuNameExists,
   isMenuPathExists,
+  moveMenu,
   updateMenu,
 };

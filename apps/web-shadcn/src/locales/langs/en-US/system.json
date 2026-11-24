@@ -108,6 +108,7 @@
     "component": "Component",
     "status": "Status",
     "authCode": "Auth Code",
+    "order": "Order",
     "createTime": "Create Time",
     "createUser": "Create User",
     "updateTime": "Update Time",

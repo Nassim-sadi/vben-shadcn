@@ -15,34 +15,109 @@ import { MenuBadge } from '@vben-core/menu-ui';
 import { Button } from '@vben-core/shadcn-ui';
 
 import { useVbenVxeGrid, useTableColumnWidths } from '#/adapter/vxe-table';
-import { deleteMenu, getMenuList, SystemMenuApi } from '#/api/system/menu';
+import {
+  deleteMenu,
+  getMenuList,
+  moveMenu,
+  SystemMenuApi,
+} from '#/api/system/menu';
 import { refreshAccessibleRoutes } from '#/router/refresh';
 
 import { useColumns } from './data';
 import Form from './modules/form.vue';
+
+type MenuRow = SystemMenuApi.SystemMenu;
+type MenuDragEnd = {
+  dragRow: MenuRow;
+  dragToChild?: boolean;
+  newRow?: MenuRow;
+  offsetIndex?: number;
+};
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
 
+/** vxe rebuilds the tree from flat rows when treeConfig.transform is true. */
+function flattenMenuTree(rows: MenuRow[]): MenuRow[] {
+  return rows.flatMap((row) => {
+    const { children, ...flat } = row;
+    return [flat, ...flattenMenuTree(children ?? [])];
+  });
+}
+
+function collectRows(rows: MenuRow[]): MenuRow[] {
+  return rows.flatMap((row) => [row, ...collectRows(row.children ?? [])]);
+}
+
+async function onMenuRowDragEnd({
+  dragRow,
+  dragToChild,
+  newRow,
+  offsetIndex = 0,
+}: MenuDragEnd) {
+  if (!dragRow?.id || !newRow?.id) {
+    return;
+  }
+  const newPid = dragToChild ? newRow.id : (newRow.pid || dragRow.pid || '0');
+  const roots = (gridApi.grid?.getTableData()?.fullData ?? []) as MenuRow[];
+  const siblings = collectRows(roots).filter(
+    (row) => (row.pid || '0') === newPid && row.id !== dragRow.id,
+  );
+  let targetIndex: number;
+  if (dragToChild) {
+    targetIndex = offsetIndex ? siblings.length : 0;
+  } else {
+    const newIndex = siblings.findIndex((row) => row.id === newRow.id);
+    if (newIndex < 0) {
+      return;
+    }
+    targetIndex = newIndex + offsetIndex;
+  }
+
+  const hideLoading = toast.loading('Updating...');
+  try {
+    await moveMenu({ menuCode: dragRow.id, pid: newPid, targetIndex });
+    toast.success($t('ui.actionMessage.operationSuccess'), { id: hideLoading });
+    await onMenuChanged();
+  } catch (error) {
+    toast.error(
+      (error as Error)?.message ?? $t('ui.actionMessage.operationFailed'),
+      { id: hideLoading },
+    );
+    onRefresh();
+  }
+}
+
 const [Grid, gridApi] = useVbenVxeGrid({
+  gridEvents: {
+    rowDragend: onMenuRowDragEnd,
+  },
   gridOptions: {
     columns: useColumns(onActionClick),
-    height: 'auto',
+    height: '100%',
     keepSource: true,
     pagerConfig: {
       enabled: false,
     },
     proxyConfig: {
       ajax: {
-        query: async (_params) => {
-          return await getMenuList();
-        },
+        query: async (_params) => flattenMenuTree(await getMenuList()),
       },
     },
     rowConfig: {
+      drag: true,
       keyField: 'id',
+    },
+    rowDragConfig: {
+      isAutoExpandToChild: true,
+      isCrossDrag: true,
+      isPeerDrag: true,
+      isToChildDrag: true,
+      showDragTip: true,
+      showIcon: true,
+      trigger: 'row',
     },
     toolbarConfig: {
       custom: true,
@@ -51,9 +126,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
       zoom: true,
     },
     treeConfig: {
+      childrenField: 'children',
+      expandAll: true,
       parentField: 'pid',
       rowField: 'id',
-      transform: false,
+      transform: true,
     },
   } as VxeTableGridOptions,
 });

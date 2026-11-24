@@ -24,12 +24,20 @@ export function useColumns(
   return [
     {
       align: 'left',
+      dragSort: true,
       field: 'meta.title',
       fixed: 'left',
       slots: { default: 'title' },
       title: $t('system.menu.menuTitle'),
       treeNode: true,
       width: 250,
+    },
+    {
+      align: 'right',
+      field: 'meta.order',
+      formatter: ({ row }) => row.meta?.order ?? '',
+      title: $t('system.menu.order'),
+      width: 90,
     },
     {
       align: 'center',
