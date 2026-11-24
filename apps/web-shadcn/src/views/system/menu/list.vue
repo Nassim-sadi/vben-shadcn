@@ -220,7 +220,7 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
         </Button>
       </template>
       <template #title="{ row }">
-        <div class="flex w-full items-center gap-1">
+        <div class="flex min-w-0 flex-1 items-center gap-1">
           <div class="size-5 shrink-0">
             <IconifyIcon
               v-if="row.type === 'button'"
@@ -233,26 +233,23 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
               class="size-full"
             />
           </div>
-          <span class="flex-auto">{{ $t(row.meta?.title) }}</span>
-          <div class="items-center justify-end"></div>
+          <span class="truncate" :title="$t(row.meta?.title)">
+            {{ $t(row.meta?.title) }}
+          </span>
+          <MenuBadge
+            v-if="row.meta?.badgeType"
+            class="menu-badge ml-auto shrink-0"
+            :badge="row.meta.badge"
+            :badge-type="row.meta.badgeType"
+            :badge-variants="row.meta.badgeVariants"
+          />
         </div>
-        <MenuBadge
-          v-if="row.meta?.badgeType"
-          class="menu-badge"
-          :badge="row.meta.badge"
-          :badge-type="row.meta.badgeType"
-          :badge-variants="row.meta.badgeVariants"
-        />
       </template>
     </Grid>
   </Page>
 </template>
 <style lang="scss" scoped>
 .menu-badge {
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-
   & > :deep(div) {
     padding-top: 0;
     padding-bottom: 0;
