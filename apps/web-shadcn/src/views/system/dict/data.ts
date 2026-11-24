@@ -16,6 +16,12 @@ const COLOR_OPTIONS = [
   { label: 'default', value: 'default' },
 ];
 
+const COLOR_TAG_OPTIONS = COLOR_OPTIONS.map(({ label, value }) => ({
+  color: value,
+  label,
+  value,
+}));
+
 /** Left tree search form: dictionary types only. */
 export function useTypeTreeFormSchema(): VbenFormSchema[] {
   return [
@@ -298,6 +304,12 @@ export function useDataColumns(
       field: 'displayOrder',
       title: $t('system.dict.displayOrder'),
       width: 90,
+    },
+    {
+      cellRender: { name: 'CellTag', options: COLOR_TAG_OPTIONS },
+      field: 'subStyleNameExt',
+      title: $t('system.dict.color'),
+      width: 110,
     },
     {
       field: 'remark',

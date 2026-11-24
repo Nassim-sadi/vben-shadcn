@@ -50,20 +50,6 @@ export function useSchema(): VbenFormSchema[] {
       label: $t('system.dept.order'),
     },
     {
-      component: 'RadioGroup',
-      componentProps: {
-        buttonStyle: 'solid',
-        options: [
-          { label: $t('common.enabled'), value: 1 },
-          { label: $t('common.disabled'), value: 0 },
-        ],
-        optionType: 'button',
-      },
-      defaultValue: 1,
-      fieldName: 'status',
-      label: $t('system.dept.status'),
-    },
-    {
       component: 'Textarea',
       componentProps: {
         maxLength: 50,
@@ -109,12 +95,6 @@ export function useColumns(
       field: 'displayOrder',
       title: $t('system.dept.order'),
       width: 90,
-    },
-    {
-      cellRender: { name: 'CellTag' },
-      field: 'status',
-      title: $t('system.dept.status'),
-      width: 100,
     },
     {
       field: 'createUserName',

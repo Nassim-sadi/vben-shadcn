@@ -36,7 +36,6 @@ function buildInitialRoles(): SystemRole[] {
       id: `sample-role-${index + 1}`,
       name: role.name,
       roleCode: role.code,
-      status: index === SAMPLE_SIZE - 1 ? 0 : 1,
       permissions: menuIds.slice(0, permissionCount),
       remark: index % 2 === 0 ? undefined : 'Auto generated role.',
       createTime: formatDateTime(created),
@@ -56,7 +55,6 @@ export interface SampleRoleQueryParams {
   pageSize?: number | string;
   remark?: string;
   startTime?: string;
-  status?: number | string;
 }
 
 export function querySampleRoles(params: SampleRoleQueryParams = {}) {
@@ -83,10 +81,6 @@ export function querySampleRoles(params: SampleRoleQueryParams = {}) {
     filtered = filtered.filter(
       (item) => item.remark && item.remark.toLowerCase().includes(keyword),
     );
-  }
-
-  if (params.status !== undefined && params.status !== '') {
-    filtered = filtered.filter((item) => item.status === Number(params.status));
   }
 
   filtered = filtered.filter((item) =>

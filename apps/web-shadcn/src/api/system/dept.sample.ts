@@ -30,7 +30,6 @@ function buildInitialTree(): SystemDept[] {
   const node = (
     id: string,
     name: string,
-    status: 0 | 1,
     remark?: string,
     children?: SystemDept[],
   ): SystemDept => ({
@@ -40,28 +39,27 @@ function buildInitialTree(): SystemDept[] {
     id,
     name,
     remark,
-    status,
     updateTime: now,
     updateUserName: 'Administrator',
     ...sampleDeptFields(id),
   });
 
   return [
-    node('sample-dept-1', 'Headquarters', 1, 'Company headquarters', [
-      node('sample-dept-11', 'R&D Center', 1, undefined, [
-        node('sample-dept-111', 'Frontend Team', 1),
-        node('sample-dept-112', 'Backend Team', 1),
-        node('sample-dept-113', 'QA Team', 1),
+    node('sample-dept-1', 'Headquarters', 'Company headquarters', [
+      node('sample-dept-11', 'R&D Center', undefined, [
+        node('sample-dept-111', 'Frontend Team'),
+        node('sample-dept-112', 'Backend Team'),
+        node('sample-dept-113', 'QA Team'),
       ]),
-      node('sample-dept-12', 'Manufacturing', 1, undefined, [
-        node('sample-dept-121', 'Assembly Line A', 1),
-        node('sample-dept-122', 'Assembly Line B', 1),
-        node('sample-dept-123', 'Quality Control', 1),
+      node('sample-dept-12', 'Manufacturing', undefined, [
+        node('sample-dept-121', 'Assembly Line A'),
+        node('sample-dept-122', 'Assembly Line B'),
+        node('sample-dept-123', 'Quality Control'),
       ]),
-      node('sample-dept-13', 'Procurement', 1),
-      node('sample-dept-14', 'Sales', 1),
-      node('sample-dept-15', 'Finance', 0, 'Merged soon'),
-      node('sample-dept-16', 'HR', 1),
+      node('sample-dept-13', 'Procurement'),
+      node('sample-dept-14', 'Sales'),
+      node('sample-dept-15', 'Finance', 'Merged soon'),
+      node('sample-dept-16', 'HR'),
     ]),
   ];
 }

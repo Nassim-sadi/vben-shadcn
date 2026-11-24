@@ -18,7 +18,6 @@ export namespace SystemDeptApi {
     name: string;
     pid?: string;
     remark?: string;
-    status: 0 | 1;
   }
 
   /** One staged drag-and-drop move, applied in order by the batch endpoint. */
