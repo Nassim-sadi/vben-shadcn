@@ -24,7 +24,6 @@ const modalData = ref<ModalData>();
 
 const [Form, formApi] = useVbenForm({
   commonConfig: { labelWidth: 'auto' },
-  schema: [],
   showDefaultActions: false,
 });
 
