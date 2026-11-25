@@ -180,7 +180,7 @@ async function confirm(content: string, title: string) {
   }
 }
 
-/** Shared by the State switch and the Lock/Unlock row actions. */
+/** Used by the State switch in the grid. */
 async function setUserStatus(
   row: SystemUserApi.SystemUser,
   status: 0 | 1,
@@ -482,20 +482,6 @@ async function handleExport() {
                 onClick: () => onEdit(row),
               },
             ]" :dropdown-actions="[
-                {
-                  text: $t('system.user.lock'),
-                  icon: 'lucide:lock',
-                  auth: ['SystemUser:edit'],
-                  disabled: row.status === 0,
-                  onClick: () => setUserStatus(row, 0),
-                },
-                {
-                  text: $t('system.user.unlock'),
-                  icon: 'lucide:lock-open',
-                  auth: ['SystemUser:edit'],
-                  disabled: row.status === 1,
-                  onClick: () => setUserStatus(row, 1),
-                },
                 {
                   text: $t('system.user.assignRole'),
                   icon: 'lucide:user-check',
