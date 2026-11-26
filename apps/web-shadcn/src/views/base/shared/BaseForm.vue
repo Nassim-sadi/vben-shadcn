@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { BaseDataApi } from '#/api';
 
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
@@ -69,7 +69,17 @@ const [Modal, modalApi] = useVbenModal<ModalData | null>({
     }
 
     modalData.value = payload;
-    formApi.updateSchema(config.form() as any);
+    const schema = config.form().map((item: any) => {
+      if (payload.row && config.keyFields.includes(item.fieldName)) {
+        return {
+          ...item,
+          componentProps: { ...(item.componentProps ?? {}), disabled: true },
+        };
+      }
+      return item;
+    });
+    formApi.setState({ schema: schema as any });
+    await nextTick();
     await formApi.reset();
     formApi.setValues(payload.row ?? {});
   },

@@ -36,8 +36,8 @@ async function refreshAccessibleRoutes() {
 
     accessStore.setAccessMenus(accessibleMenus);
     accessStore.setAccessRoutes(accessibleRoutes);
-  } catch (error) {
-    console.error('[menu-access] failed to refresh accessible routes', error);
+  } catch {
+    // Ignore refresh failures; the current route table remains usable.
   } finally {
     refreshing = false;
   }

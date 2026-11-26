@@ -28,37 +28,14 @@ async function generateAccess(
   return await generateAccessible(preferences.app.accessMode, {
     ...options,
     fetchMenuListAsync: async () => {
-      const startedAt = Date.now();
-      console.log('[menu-access] fetchMenuListAsync start', {
-        at: new Date().toISOString(),
-        href: location.href,
-        silent,
-      });
       const toastId = silent
         ? undefined
         : toast.loading(`${$t('common.loadingMenu')}...`, {
             duration: 1500,
           });
       try {
-        const menus = await getAllMenusApi();
-        console.log('[menu-access] fetchMenuListAsync success', {
-          durationMs: Date.now() - startedAt,
-          count: menus?.length,
-          toastId,
-        });
-        return menus;
-      } catch (error) {
-        console.error('[menu-access] fetchMenuListAsync error', {
-          durationMs: Date.now() - startedAt,
-          toastId,
-          error,
-        });
-        throw error;
+        return await getAllMenusApi();
       } finally {
-        console.log('[menu-access] fetchMenuListAsync finally; dismissing toast', {
-          durationMs: Date.now() - startedAt,
-          toastId,
-        });
         if (toastId) {
           toast.dismiss(toastId);
         }

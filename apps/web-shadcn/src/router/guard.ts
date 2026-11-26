@@ -36,12 +36,6 @@ function setupAccessGuard(router: Router) {
     const accessStore = useAccessStore();
     const userStore = useUserStore();
     const authStore = useAuthStore();
-    console.log('[router-guard] beforeEach', {
-      at: new Date().toISOString(),
-      to: to.fullPath,
-      from: from.fullPath,
-      isAccessChecked: accessStore.isAccessChecked,
-    });
     if (coreRouteNames.includes(to.name)) {
       if (to.path === LOGIN_PATH && accessStore.accessToken) {
         return decodeURIComponent(
